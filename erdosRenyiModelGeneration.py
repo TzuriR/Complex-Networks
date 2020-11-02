@@ -1,11 +1,11 @@
-
 from networkx.generators.random_graphs import erdos_renyi_graph
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
 # Generate graph
-def genGraph(n, p):
-    #Random------------------------
+def gen_graph(n, p):
+    # Random------------------------
     g = erdos_renyi_graph(n, p)
     print("g.nodes:")
     print(g.nodes)
