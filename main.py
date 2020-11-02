@@ -2,23 +2,13 @@ import posaAlgorithm
 import erdosRenyiModelGeneration
 import geometricModelGeneration
 
-'''
-#-----------------------------------------------------------
-#Run random graph
-n = 30
-p = 0.2
-g = erdosRenyiModelGeneration.GenGraph(n, p)
-railV, railE = posaAlgorithm.Posa(g)
-
-'''
-#-----------------------------------------------------------
-#Run geometric random graph
-n = 100
-r = 0.2
-g = geometricModelGeneration.GenGraph(n, r)
-print("g.nodes:")
-print(g.nodes)
-print("g.edges:")
-print(g.edges)
-railV, railE = posaAlgorithm.Posa(g)
-
+# Call function
+n = 20
+p = 0.5
+r = 0.4
+g = erdosRenyiModelGeneration.gen_graph(n, p)
+rail_v_gnp, rail_e_gnp = posaAlgorithm.posa(g)
+# print
+g = geometricModelGeneration.gen_graph(n, r)
+rail_v_geo, rail_e_geo = posaAlgorithm.posa(g)
+# print
