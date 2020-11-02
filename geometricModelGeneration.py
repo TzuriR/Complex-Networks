@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # draw [0,1]^2
 
 
-def genGraph(n, r):
+def gen_graph(n, r):
     # n = 30
     # radius = 0.4
     # dim = 2
@@ -16,8 +16,8 @@ def genGraph(n, r):
     # pos = {i: (random.gauss(0, 1), random.gauss(0, 1)) for i in range(n)}
     # G = nx.random_geometric_graph(n=n, radius=radius, dim=dim, pos=pos, p=p, seed=None)
 
-    G = nx.random_geometric_graph(n=n, radius=r)
-    nx.draw(G, with_labels=True)
+    g = nx.random_geometric_graph(n=n, radius=r)
+    nx.draw(g, with_labels=True)
     plt.savefig("simple_path.png")
     plt.show()
-    return G
+    return g
