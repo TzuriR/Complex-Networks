@@ -7,9 +7,9 @@ def posa(g):
     rail_v = []
     rail_e = []
     # We are starting from the first node - insert it to the rail and call to utility function
-    x = 0
+    x = next(iter(g.nodes))
     rail_v.append(x)
-    posa_loop(g, x, rail_v, rail_e)
+    rail_v, rail_e = posa_loop(g, x, rail_v, rail_e)
     return rail_v, rail_e
 
 
@@ -21,7 +21,7 @@ def posa(g):
 
 def posa_loop(g, x, rail_v, rail_e):
     # call utility function that create initial path
-    insert_to_rail(g, x, rail_v, rail_e)
+    rail_v, rail_e = insert_to_rail(g, x, rail_v, rail_e)
     print("rail_v:")
     print(rail_v)
     print("rail_e:")
@@ -53,7 +53,7 @@ def posa_loop(g, x, rail_v, rail_e):
         print(rail_e)
     # Check if the path is not hamiltonian - go back
     else:
-        posa_loop(g, rail_v[len(rail_v) - 1], rail_v, rail_e)
+        rail_v, rail_e = posa_loop(g, rail_v[len(rail_v) - 1], rail_v, rail_e)
 
     return rail_v, rail_e
 
@@ -209,46 +209,9 @@ def insert_to_rail(g, x, rail_v, rail_e):
         if is_at(rail_v, y) == 0:
             rail_v.append(y)
             rail_e.append((x, y))
-            insert_to_rail(g, y, rail_v, rail_e)
+            rail_v, rail_e = insert_to_rail(g, y, rail_v, rail_e)
             break
-    '''
-    # Run all over x's neighbors and insert them into arrays
-    adjXR = []
-    adjXL = []
-    for e in g.edges:
-        if e[0] == x:
-            adjXR.append(e[1])
-        if e[1] == x:
-            adjXL.append(e[0])
-    print("x:")
-    print(x)
-    flag = 0
-    # Choose one of x's neighbors right that not exists at rail_v
-    for y in adjXR:
-        print("y:")
-        print(y)
-        if isAt(rail_v, y) == 1:
-            continue
-        else:
-            rail_v.append(y)
-            rail_e.append((x, y))
-            insertToRail(g, y, rail_v, rail_e)
-            flag = 1
-            break
-
-    if flag != 1:
-        # Choose one of x's neighbors left that not exists at rail_v
-        for z in adjXL:
-            print("z:")
-            print(z)
-            if isAt(rail_v, z) == 1:
-                continue
-            else:
-                rail_v.append(z)
-                rail_e.append((x, z))
-                insertToRail(g, z, rail_v, rail_e)
-                break
-    '''
+    return rail_v, rail_e
 
 
 # Utility function: get element and arr, return 1 if the element is at the array and 0 if not
