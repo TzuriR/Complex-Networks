@@ -1,7 +1,6 @@
 # Posa algorithm
 def posa(g):
     # Step 1-------------------------------------------------------
-
     print("Start of step 1:")
     n = len(g.nodes)
     rail_v = []
@@ -13,22 +12,16 @@ def posa(g):
     return rail_v, rail_e
 
 
-# -----------------------------------------------------------------
-# Utility functions:
-
 # --------------------------------------------------------------------------------
 # Utility function, get graph and node, and do the 3 steps of building an hamiltonian cycle
 
 def posa_loop(g, x, rail_v, rail_e):
     # call utility function that create initial path
     rail_v, rail_e = insert_to_rail(g, x, rail_v, rail_e)
-    print("rail_v:")
-    print(rail_v)
-    print("rail_e:")
-    print(rail_e)
+    print("rail_v:", rail_v)
+    print("rail_e:", rail_e)
 
     # Step 2-------------------------------------------------------
-
     print("Start of step 2:")
     # Check if the path is not hamiltonian
     if len(rail_v) < len(g.nodes):
@@ -36,10 +29,8 @@ def posa_loop(g, x, rail_v, rail_e):
             exit('algorithm failed to find a path!')  # algorithm failed
         # If the algorithm didn't fail - call utility function that make it hamiltonian
         rail_v, rail_e = rot_ext(g, rail_v, rail_e)
-    print("rail_v:")
-    print(rail_v)
-    print("rail_e:")
-    print(rail_e)
+    print("rail_v:", rail_v)
+    print("rail_e:", rail_e)
 
     # Step 3-------------------------------------------------------
     print("Start of step 3:")
@@ -47,20 +38,16 @@ def posa_loop(g, x, rail_v, rail_e):
     if len(rail_v) == len(g.nodes):
         # Call utility function that will make it cycle
         rail_v, rail_e = make_cycle(g, rail_v, rail_e)
-        print("rail_v:")
-        print(rail_v)
-        print("rail_e:")
-        print(rail_e)
+        print("rail_v:", rail_v)
+        print("rail_e:", rail_e)
     # Check if the path is not hamiltonian - go back
     else:
         rail_v, rail_e = posa_loop(g, rail_v[len(rail_v) - 1], rail_v, rail_e)
-
     return rail_v, rail_e
 
 
 # --------------------------------------------------------------------------------
 # Utility function- get hamiltonian path and convert it to hamiltonian cycle
-
 def make_cycle(g, rail_v, rail_e):
     # If there is (x0, xn) - add it to the rail and finish
     if (is_at(g.edges, (rail_v[0], rail_v[len(rail_v) - 1])) == 1) or (
