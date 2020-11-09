@@ -4,22 +4,17 @@ import math
 # Posa algorithm
 def posa(g):
     # Step 1-------------------------------------------------------
-
     print("Start of step 1:")
     n = len(g.nodes)
     rail_v = []
     rail_e = []
     # We are starting from the first node - insert it to the rail and call to utility function
     x = next(iter(g.nodes))
-    print("x:")
-    print(x)
+    print("x:", x)
     rail_v.append(x)
     rail_v, rail_e = posa_loop(g, x, rail_v, rail_e)
     return rail_v, rail_e
 
-
-# -----------------------------------------------------------------
-# Utility functions:
 
 # --------------------------------------------------------------------------------
 # Utility function, get graph and node, and do the 3 steps of building an hamiltonian cycle
@@ -27,13 +22,10 @@ def posa(g):
 def posa_loop(g, x, rail_v, rail_e):
     # call utility function that create initial path
     rail_v, rail_e = insert_to_rail(g, x, rail_v, rail_e)
-    print("rail_v:")
-    print(rail_v)
-    print("rail_e:")
-    print(rail_e)
+    print("rail_v:", rail_v)
+    print("rail_e:", rail_e)
 
     # Step 2-------------------------------------------------------
-
     print("Start of step 2:")
     # Check if the path is not hamiltonian
     if len(rail_v) < len(g.nodes):
@@ -41,10 +33,8 @@ def posa_loop(g, x, rail_v, rail_e):
             exit('algorithm failed to find a path!')  # algorithm failed
         # If the algorithm didn't fail - call utility function that make it hamiltonian
         rail_v, rail_e = rot_ext(g, rail_v, rail_e)
-    print("rail_v:")
-    print(rail_v)
-    print("rail_e:")
-    print(rail_e)
+    print("rail_v:", rail_v)
+    print("rail_e:", rail_e)
 
     # Step 3-------------------------------------------------------
     print("Start of step 3:")
@@ -52,14 +42,11 @@ def posa_loop(g, x, rail_v, rail_e):
     if len(rail_v) == len(g.nodes):
         # Call utility function that will make it cycle
         rail_v, rail_e = make_cycle(g, rail_v, rail_e)
-        print("rail_v:")
-        print(rail_v)
-        print("rail_e:")
-        print(rail_e)
+        print("rail_v:", rail_v)
+        print("rail_e:", rail_e)
     # Check if the path is not hamiltonian - go back
     else:
         rail_v, rail_e = posa_loop(g, rail_v[len(rail_v) - 1], rail_v, rail_e)
-
     return rail_v, rail_e
 
 
@@ -104,8 +91,7 @@ def approximation_of_edges(g, rail_v, rail_e):
     a = rail_v[0]  # left end of rail
     b = rail_v[len(rail_v) - 1]  # right end of rail
     dist_a_b = node_distance(g, a, b)
-    print("dist_a_b:")
-    print(dist_a_b)
+    print("dist_a_b:", dist_a_b)
     temp_v = []
     temp_e = []
     # Run all over the rail and chek for end node that will make the distance smaller
@@ -179,7 +165,6 @@ def rot_ext(g, rail_v, rail_e):
             adj_x.append(e[1])
         if e[1] == xt:
             adj_x.append(e[0])
-
     # Do the extension rotation
     if len(adj_x) <= 1:
         exit('algorithm failed to find a path!')  # algorithm failed
@@ -281,15 +266,12 @@ def absorb_vertices(g, rail_v, rail_e):
     # first neighbor and second neighbor found - greedy
     # absorb
     # return railV and railV
-
     if len(rail_v) <= 1:
         return rail_v, rail_e
-
     # Run all over V and check every node that is not in rail_v
     for v in g.nodes:
         if is_at(rail_v, v) == 1:
             continue
-
         # adj_v - v's neighboors that already in rail_v
         adj_v = []
         for e in g.edges:
