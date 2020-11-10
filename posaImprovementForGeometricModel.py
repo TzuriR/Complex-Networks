@@ -123,6 +123,23 @@ def approximation_of_edges(g, rail_v, rail_e):
             rail_e = temp_e
     return rail_v, rail_e
 
+# --------------------------------------------------------------------------------------------------------------------
+# Utility function: get two node and return the distance between
+
+def node_distance(g, a, b):
+    x_pos_a, y_pos_a = g.nodes[a]['pos']
+    # print("a:")
+    # print(a)
+    x_pos_b, y_pos_b = g.nodes[b]['pos']
+    # print("b:")
+    # print(b)
+    # The distance between a and b
+    val = (x_pos_a - x_pos_b) * 2 + (y_pos_a - y_pos_b) * 2
+    dist_a_b = math.sqrt(val)
+    # print("dist_a_b:")
+    # print(dist_a_b)
+    return dist_a_b
+
 
 # ---------------------------------------------------------------------------------
 # Utility function: do the swap of the rotation extension
@@ -320,24 +337,6 @@ def apply_absorption(rail_v, rail_e, v, xi, xi_plus_one):
         temp_e.append((rail_v[index - 1], rail_v[index]))
         index += 1
     return temp_v, temp_e
-
-
-# --------------------------------------------------------------------------------------------------------------------
-# Utility function: get two node and return the distance between
-
-def node_distance(g, a, b):
-    x_pos_a, y_pos_a = g.nodes[a]['pos']
-    # print("a:")
-    # print(a)
-    x_pos_b, y_pos_b = g.nodes[b]['pos']
-    # print("b:")
-    # print(b)
-    # The distance between a and b
-    val = (x_pos_a - x_pos_b) * 2 + (y_pos_a - y_pos_b) * 2
-    dist_a_b = math.sqrt(val)
-    # print("dist_a_b:")
-    # print(dist_a_b)
-    return dist_a_b
 
 
 # --------------------------------------------------------------------------------------------------------------------
