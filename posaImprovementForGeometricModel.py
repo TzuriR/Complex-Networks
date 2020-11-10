@@ -10,7 +10,6 @@ def posa(g):
     rail_e = []
     # We are starting from the first node - insert it to the rail and call to utility function
     x = next(iter(g.nodes))
-    print("x:", x)
     rail_v.append(x)
     rail_v, rail_e = posa_loop(g, x, rail_v, rail_e)
     return rail_v, rail_e
@@ -79,8 +78,13 @@ def make_cycle(g, rail_v, rail_e):
                     break
         i += 1
     if flag == 0:
+        print("Before approximation:")
+        print("rail_v:", rail_v)
+        print("rail_e:", rail_e)
         rail_v, rail_e = approximation_of_edges(g, rail_v, rail_e)
-        exit('algorithm failed to find a cycle!')  # algorithm failed
+        print("After approximation:")
+        if len(rail_v) != len(rail_e):
+            exit('algorithm failed to find a cycle!')  # algorithm failed
     return rail_v, rail_e
 
 
@@ -91,15 +95,14 @@ def approximation_of_edges(g, rail_v, rail_e):
     a = rail_v[0]  # left end of rail
     b = rail_v[len(rail_v) - 1]  # right end of rail
     dist_a_b = node_distance(g, a, b)
-    print("dist_a_b:", dist_a_b)
     temp_v = []
     temp_e = []
-    # Run all over the rail and chek for end node that will make the distance smaller
+    # Run all over the rail and check for end node that will make the distance smaller
     for vi in rail_v:
-        if is_at((vi, b), g.edges) == 0:
+        if is_at(g.edges, (vi, b)) == 0 and is_at(g.edges, (b, vi)) == 0:
             continue
         vi_plus_one = rail_v[rail_v.index(vi) + 1]
-        dist_temp = node_distance(g, vi_plus_one, a)
+        dist_temp = node_distance(g, a, vi_plus_one)
         # Option 1 : run all over vi possible and look for minimum distance between vi_plus_one and make the exchange
         # Option 2 : once the condition of an existing edge between vi and b is met - do the exchange
         if dist_temp < dist_a_b:
@@ -119,8 +122,17 @@ def approximation_of_edges(g, rail_v, rail_e):
                 temp_v.append(rail_v[end_index])
                 temp_e.append((rail_v[end_index + 1], rail_v[end_index]))
                 end_index -= 1
+            #If there is an edge that make it a cycle
+            if is_at(g.edges, (vi_plus_one, a)) == 1 or is_at(g.edges, (a, vi_plus_one)) == 1:
+                temp_e.append((vi_plus_one, a))
             rail_v = temp_v
             rail_e = temp_e
+            if len(rail_v) == len(rail_e):
+                break
+            #Update b for the next itration
+            #b = vi_plus_one
+            rail_v, rail_e = approximation_of_edges(g, rail_v, rail_e)
+            break
     return rail_v, rail_e
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -128,16 +140,11 @@ def approximation_of_edges(g, rail_v, rail_e):
 
 def node_distance(g, a, b):
     x_pos_a, y_pos_a = g.nodes[a]['pos']
-    # print("a:")
-    # print(a)
     x_pos_b, y_pos_b = g.nodes[b]['pos']
-    # print("b:")
-    # print(b)
     # The distance between a and b
-    val = (x_pos_a - x_pos_b) * 2 + (y_pos_a - y_pos_b) * 2
+    val = (x_pos_a - x_pos_b) ** 2 + (y_pos_a - y_pos_b) ** 2
     dist_a_b = math.sqrt(val)
-    # print("dist_a_b:")
-    # print(dist_a_b)
+    #print("a:", a, "b:", b, "dist_a_b:", dist_a_b)
     return dist_a_b
 
 
@@ -337,7 +344,6 @@ def apply_absorption(rail_v, rail_e, v, xi, xi_plus_one):
         temp_e.append((rail_v[index - 1], rail_v[index]))
         index += 1
     return temp_v, temp_e
-
 
 # --------------------------------------------------------------------------------------------------------------------
 # Utility function: get element and arr, return 1 if the element is at the array and 0 if not
