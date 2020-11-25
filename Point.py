@@ -10,6 +10,7 @@ class Point:
         self.serial_number = num
         if x is None:
             self.x_value = rd.uniform(0, 1)
+        if y is None:
             self.y_value = rd.uniform(0, 1)
         else:
             self.x_value = x
