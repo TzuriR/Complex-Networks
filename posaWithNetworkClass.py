@@ -1,4 +1,5 @@
-#This file include posa algoritm with the network class
+import math
+
 
 # Posa algorithm
 def posa(g):
@@ -50,6 +51,7 @@ def posa_loop(g, x, rail_v, rail_e):
 
 # --------------------------------------------------------------------------------
 # Utility function- get hamiltonian path and convert it to hamiltonian cycle
+
 def make_cycle(g, rail_v, rail_e):
     # If there is (x0, xn) - add it to the rail and finish
     if (is_at(g.edges, (rail_v[0], rail_v[len(rail_v) - 1])) == 1) or (
@@ -76,14 +78,79 @@ def make_cycle(g, rail_v, rail_e):
                     break
         i += 1
     if flag == 0:
-        exit('algorithm failed to find a cycle!')  # algorithm failed
+        print("Before approximation:")
+        print("rail_v:", rail_v)
+        print("rail_e:", rail_e)
+        rail_v, rail_e = approximation_of_edges(g, rail_v, rail_e)
+        print("After approximation:")
+        if len(rail_v) != len(rail_e):
+            exit('algorithm failed to find a cycle!')  # algorithm failed
     return rail_v, rail_e
 
 
 # --------------------------------------------------------------------------------
+# Utility function: approximate the end vertices by rotation
+
+def approximation_of_edges(g, rail_v, rail_e):
+    a = rail_v[0]  # left end of rail
+    b = rail_v[len(rail_v) - 1]  # right end of rail
+    dist_a_b = node_distance(g, a, b)
+    temp_v = []
+    temp_e = []
+    # Run all over the rail and check for end node that will make the distance smaller
+    for vi in rail_v:
+        if is_at(g.edges, (vi, b)) == 0 and is_at(g.edges, (b, vi)) == 0:
+            continue
+        vi_plus_one = rail_v[rail_v.index(vi) + 1]
+        dist_temp = node_distance(g, a, vi_plus_one)
+        # Option 1 : run all over vi possible and look for minimum distance between vi_plus_one and make the exchange
+        # Option 2 : once the condition of an existing edge between vi and b is met - do the exchange
+        if dist_temp < dist_a_b:
+            dist_a_b = dist_temp
+            # The exchange
+            index = 0
+            while rail_v[index] != vi_plus_one:
+                temp_v.append(rail_v[index])
+                if index != 0:
+                    temp_e.append((rail_v[index - 1], rail_v[index]))
+                index += 1
+            temp_v.append(b)
+            temp_e.append((vi, b))
+            # endIndex run on rail_v, index run on tempV
+            end_index = len(rail_v) - 2
+            while end_index >= rail_v.index(vi_plus_one):
+                temp_v.append(rail_v[end_index])
+                temp_e.append((rail_v[end_index + 1], rail_v[end_index]))
+                end_index -= 1
+            #If there is an edge that make it a cycle
+            if is_at(g.edges, (vi_plus_one, a)) == 1 or is_at(g.edges, (a, vi_plus_one)) == 1:
+                temp_e.append((vi_plus_one, a))
+            rail_v = temp_v
+            rail_e = temp_e
+            if len(rail_v) == len(rail_e):
+                break
+            #Update b for the next itration
+            #b = vi_plus_one
+            rail_v, rail_e = approximation_of_edges(g, rail_v, rail_e)
+            break
+    return rail_v, rail_e
+
+# --------------------------------------------------------------------------------------------------------------------
+# Utility function: get two node and return the distance between
+
+def node_distance(g, a, b):
+    x_pos_a, y_pos_a = g.nodes[a]['pos']
+    x_pos_b, y_pos_b = g.nodes[b]['pos']
+    # The distance between a and b
+    val = (x_pos_a - x_pos_b) ** 2 + (y_pos_a - y_pos_b) ** 2
+    dist_a_b = math.sqrt(val)
+    #print("a:", a, "b:", b, "dist_a_b:", dist_a_b)
+    return dist_a_b
+
+
+# ---------------------------------------------------------------------------------
 # Utility function: do the swap of the rotation extension
 # This function add the edges (xi+1,x1), (xi,xn) and delete the edge (xi, xi+1)
-
 
 def swap_cycle(x0, xi, xi_plus_one, xn, rail_v, rail_e):
     temp_v = []
@@ -122,7 +189,6 @@ def rot_ext(g, rail_v, rail_e):
             adj_x.append(e[1])
         if e[1] == xt:
             adj_x.append(e[0])
-
     # Do the extension rotation
     if len(adj_x) <= 1:
         exit('algorithm failed to find a path!')  # algorithm failed
@@ -200,10 +266,88 @@ def insert_to_rail(g, x, rail_v, rail_e):
             rail_e.append((x, y))
             rail_v, rail_e = insert_to_rail(g, y, rail_v, rail_e)
             break
+    rail_v, rail_e = absorb_vertices(g, rail_v, rail_e)
     return rail_v, rail_e
 
 
+def absorb_vertices(g, rail_v, rail_e):
+    # do for every vertex possible
+    # for every two vertices that are next to each other on the rail
+    """
+    # all neighbors in rail
+    adj_v = []
+    for v in g.nodes:# O(n^2)
+        for e in g.edges:
+            if e[0] == v and e[0] in rail_v:
+                adj_v.append(e[1])
+            if e[1] == v and e[1] in rail_v:
+                adj_v.append(e[0])
+    for v1 in g.nodes:  # O(n^2)
+        for v2 in rail_v:
+            if (v1,v2) in rail_e or (v2,v1) in rail_e:
+                adj_v.append(v2)
+    """
+    # first neighbor and second neighbor found - greedy
+    # absorb
+    # return railV and railV
+    if len(rail_v) <= 1:
+        return rail_v, rail_e
+    # Run all over V and check every node that is not in rail_v
+    for v in g.nodes:
+        if is_at(rail_v, v) == 1:
+            continue
+        # adj_v - v's neighboors that already in rail_v
+        adj_v = []
+        for e in g.edges:
+            if e[0] == v and is_at(rail_v, e[1]) == 1:
+                adj_v.append(e[1])
+            if e[1] == v and is_at(rail_v, e[0]) == 1:
+                adj_v.append(e[0])
+        # Check for two following neighboors in rail_v that have neighboor which is not in rail_v
+        for xi in rail_v:
+            if xi == rail_v[len(rail_v) - 1]:
+                continue
+            if is_at(adj_v, xi) == 0:
+                continue
+            xi_plus_one = rail_v[rail_v.index(xi) + 1]
+            if is_at(adj_v, xi_plus_one) == 0:
+                continue
+            rail_v, rail_e = apply_absorption(rail_v, rail_e, v, xi, xi_plus_one)
+            break
+    return rail_v, rail_e
+
+
+# --------------------------------------------------------------------------------------------------------------------
+# Utility function: insert v to the rail between xi and xi_plus_one
+
+def apply_absorption(rail_v, rail_e, v, xi, xi_plus_one):
+    temp_v = []
+    temp_e = []
+    index = 0
+    # Insert all the nodes until xi
+    while rail_v[index] != xi_plus_one:
+        temp_v.append(rail_v[index])
+        if index != 0:
+            temp_e.append((rail_v[index - 1], rail_v[index]))
+            # temp_e.append(rail_e[index-1])
+        index += 1
+    # Insert all v and xi_plus_one
+    temp_v.append(v)
+    temp_e.append((xi, v))
+    temp_v.append(xi_plus_one)
+    temp_e.append((v, xi_plus_one))
+    index += 1
+    # Insert all the nodes until the end
+    while index < len(rail_v):
+        temp_v.append(rail_v[index])
+        # if index != len(rail_v)-1:
+        temp_e.append((rail_v[index - 1], rail_v[index]))
+        index += 1
+    return temp_v, temp_e
+
+# --------------------------------------------------------------------------------------------------------------------
 # Utility function: get element and arr, return 1 if the element is at the array and 0 if not
+
 def is_at(arr, ele):
     for a in arr:
         if a == ele:
