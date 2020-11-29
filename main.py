@@ -2,16 +2,37 @@ import posaAlgorithm
 import erdosRenyiModelGeneration
 import geometricModelGeneration
 import posaImprovementForGeometricModel
+import posaWithNetworkClass
+import erdosRenyiNetwork
+import Point as pnt
+import random as rd
+import Edge as edg
 
+#Run posa on edros renyi network
+er_net = erdosRenyiNetwork.Network()
+n = 20
+for i in range(0, n):
+    p = pnt.Point(i)
+    er_net.add_vertex(p)
+for i in range(0, n):
+    num = round(rd.uniform(0, n))
+    for j in range(0, num):
+        if i != j:
+            er_net.add_edge_by_vtx(er_net.nodes[i], er_net.nodes[j])
+er_net.draw_network()
+rail_v, rail_e = posaWithNetworkClass.posa(er_net)
+
+
+'''
 # Call function
-n = 6
+n = 20
 p = 0.8
-r = 0.9
+r = 0.4
 # g = erdosRenyiModelGeneration.gen_graph(n, p)
 # rail_v_gnp, rail_e_gnp = posaAlgorithm.posa(g)
 g = geometricModelGeneration.gen_graph(n, r)
-rail_v_geo, rail_e_geo = posaAlgorithm.posa(g)
-
+# rail_v_geo, rail_e_geo = posaAlgorithm.posa(g)
+rail_v_geo, rail_e_geo = posaImprovementForGeometricModel.posa(g)'''
 '''
 g = nx.Graph()
 g.add_nodes_from([1, 2, 3, 4, 5, 6,7,8,9,10,11])
