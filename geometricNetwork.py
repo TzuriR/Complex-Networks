@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import Point as pnt
 import Edge as edg
 import random as rd
-
+import math
 
 class Network:
     # nodes = [pnt.Point]??
@@ -14,11 +14,12 @@ class Network:
     # adjacency_matrix = [] # num_of_nodes X num_of_nodes
     num_of_nodes: int = 0
     num_of_edges: int = 0
+    r : float = 0
 
     # g = nx.Graph()  # in case of a random graph auto generated
 
-    # def __init__(self, model: str):
-    #    self.model = model
+    def __init__(self, r: float):
+        self.r = r
 
     def random_generator(self, n: int, pr: int):
         if self.model == "ErdosRenyi":
@@ -37,8 +38,14 @@ class Network:
         self.num_of_nodes += 1
         return self.num_of_nodes
 
-    def add_edge_by_vtx(self, vtx1: pnt.Point,
-                        vtx2: pnt.Point) -> int:  # returns number of the edge assigned to the network
+    def make_edges(self):
+        for i in range(0, len(self.nodes)):
+            for j in range(0, len(self.nodes)):
+                if i == j: continue
+                if self.node_distance(self.nodes[i], self.nodes[j]) < self.r:
+                    self.add_edge_by_vtx(self.nodes[i], self.nodes[j])
+
+    def add_edge_by_vtx(self, vtx1: pnt.Point, vtx2: pnt.Point) -> int:  # returns number of the edge assigned to the network
         if vtx1 not in self.nodes or vtx2 not in self.nodes:
             print("Need to add these nodes first")
             return -1
@@ -49,14 +56,18 @@ class Network:
         # x_normal = np.hstack((x0, x_normal))
         return self.num_of_edges
 
-    def add_edge_by_edg(self, edge: edg.Edge) -> int:  # returns number of the edge assigned to the network
-        self.edges.append(edge)
-        self.num_of_edges += 1
-        # x0 = np.ones((m, 1))
-        # x_normal = np.hstack((x0, x_normal))
-        return self.num_of_edges
+    # Utility function: get two node and return the distance between
+
+    def node_distance(self, vtx1: pnt.Point, vtx2: pnt.Point):
+        x_pos_vtx1, y_pos_vtx1 = vtx1.x_value, vtx1.y_value
+        x_pos_vtx2, y_pos_vtx2 = vtx2.x_value, vtx2.y_value
+        # The distance between vtx1 and vtx2
+        val = (x_pos_vtx1 - x_pos_vtx2) ** 2 + (y_pos_vtx1 - y_pos_vtx2) ** 2
+        dist_vtx = math.sqrt(val)
+        return dist_vtx
 
     # Utility function: get index of point, return 1 if the point is at the array and 0 if not
+
     def is_at_point(self, points_arr, index: int) -> bool:
         for p in points_arr:
             if p.serial_number == index:
@@ -79,7 +90,9 @@ class Network:
                 return True
         return False
 
+
     # Build adjacency matrix and return it
+
     def adjacency_matrix(self):
         adj_mat = [[0 for x in range(self.num_of_nodes)] for y in range(self.num_of_nodes)]
         for i in range(0, self.num_of_nodes):
