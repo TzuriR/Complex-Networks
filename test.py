@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 import posaImprovementForGeometricModel
 import Point as pnt
 import Edge as edg
-import erdosRenyiNetwork as net
+import erdosRenyiNetwork as er_net
+import geometricNetwork as ge_net
 
-net_example = net.Network()
+#Run random graph :
+'''net_example = er_net.Network()
 p0 = pnt.Point(0)
 net_example.add_vertex(p0)
 p1 = pnt.Point(1)
@@ -33,6 +35,17 @@ edge4 = edg.Edge(p4, p5, 4)
 net_example.add_edge_by_edg(edge4)
 edge5 = edg.Edge(p5, p0, 5)
 net_example.add_edge_by_edg(edge5)
+net_example.print_network()
+net_example.draw_network()'''
+
+#Run geometric graph :
+r = 0.4
+net_example = ge_net.Network(r)
+n = 12
+for i in range(0, n):
+    p = pnt.Point(i)
+    net_example.add_vertex(p)
+net_example.make_edges()
 net_example.print_network()
 net_example.draw_network()
 
@@ -65,4 +78,3 @@ for v in g.nodes:
     print("x:", x, "y:", y)
     i += 1
 '''
-
