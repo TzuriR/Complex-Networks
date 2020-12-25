@@ -1,0 +1,33 @@
+if __name_ == '__main__':
+    main()
+
+'''groups = np.empty(shape=num_of_groups, dtype=np.ndarray)
+    print(type(groups))
+    arr = subgroup_by_condition(arr_of_nodes, 0, 0.25, 0, 0.25)
+    groups = np.array([arr])
+    print("arr:")
+    print_point_arr(arr)
+    groups = np.vstack((groups, arr))
+    print("groups:")
+    print_squares_arr(groups)
+    arr1 = subgroup_by_condition(arr_of_nodes, 0.25, 0.5, 0.25, 0.5)
+    print("arr1:")
+    print_point_arr(arr1)
+    groups = np.vstack((groups, arr1))
+    print("groups:")
+    print_squares_arr(groups)
+    arr_of_nodes = np.array(net.nodes)
+    print_point_arr(arr_of_nodes)
+    temp = arr_of_nodes[(arr_of_nodes, )]
+    groups = np.array(temp)
+    groups = np.empty(num_of_groups)
+    #groups[:] = np.nan
+    p0 = pnt.Point(0)
+    p1 = pnt.Point(1)
+    arr1 = np.array([p0, p1])
+    p2 = pnt.Point(2)
+    p3 = pnt.Point(3)
+    arr2 = np.array([p2, p3])
+    arr = np.array([arr1])
+    arr = np.vstack((arr, arr2))
+    print_squares_arr(arr)'''
