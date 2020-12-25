@@ -1,3 +1,39 @@
+# -----------------------------------------------------------------------------------------------------------
+# main
+
+def main():
+    r = 0.5
+    n = 20
+    net = ge_net.Network(r)
+    for i in range(0, n):
+        p = pnt.Point(i)
+        net.add_vertex(p)
+    net.make_edges()
+    net.draw_network()
+    groups_on_grid = divide_to_grid(net, r)
+    print("========================================================================================")
+    print("groups_on_grid:")
+    print_list_of_dict(groups_on_grid)
+    # Make sure num_of_squares is squared!!!!!!!!!!!!!!!!!!
+    threshold = calculate_threshold(n, r)
+    print("========================================================================================")
+    print("threshold:", threshold)
+    dense_group, sparse_group = divide_dense_from_sparse(groups_on_grid, n, r)
+    print("========================================================================================")
+    print("Dense group:")
+    print_list_of_dict(dense_group)
+    print("========================================================================================")
+    print("Sparse group:")
+    print_list_of_dict(sparse_group)
+    # print("========================================================================================")
+    # label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group, r)
+    print("========================================================================================")
+    g_tag = build_g_tag(net, groups_on_grid, threshold)
+    nx.draw(g_tag, with_labels=True)
+    plt.savefig("g_tag_drawing.png")
+    plt.show()
+    
+    
 if __name_ == '__main__':
     main()
 
