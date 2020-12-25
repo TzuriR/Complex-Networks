@@ -1,4 +1,37 @@
+# -----------------------------------------------------------------------------------------------------------
+# Get group and index and return the square of its index
 
+def find_square_by_point(groups_on_grid, index):
+    if index < 0 or index >= len(groups_on_grid):
+        return np.nan
+    for sq in groups_on_grid:
+        if sq['index_gtag'] == index:
+            return sq
+    return np.nan
+
+
+# -----------------------------------------------------------------------------------------------------------
+# Return if the squares are friends
+
+def is_friend(sparse_square, dense_square, r):
+    for i in range(-2, 3):
+        for j in range(-2, 3):
+            '''print("dense_square['bnd_x_down'] :", dense_square['bnd_x_down'])
+            print("sparse_square['bnd_x_down'] + i*(r/2) :", sparse_square['bnd_x_down'] + i*(r/2))
+            print("dense_square['bnd_x_up'] :", dense_square['bnd_x_up'])
+            print("sparse_square['bnd_x_up'] + i*(r/2) :", sparse_square['bnd_x_up'] + i*(r/2))
+            print("dense_square['bnd_y_down'] :", dense_square['bnd_y_down'])
+            print("sparse_square['bnd_y_down'] + i*(r/2) :", sparse_square['bnd_y_down'] + i*(r/2))
+            print("dense_square['bnd_y_up'] :", dense_square['bnd_y_up'])
+            print("sparse_square['bnd_y_up'] + i*(r/2) :", sparse_square['bnd_y_up'] + i*(r/2))'''
+            if dense_square['bnd_x_down'] == sparse_square['bnd_x_down'] + i * (r / 2) and \
+                    dense_square['bnd_x_up'] == sparse_square['bnd_x_up'] + i * (r / 2):
+                if dense_square['bnd_y_down'] == sparse_square['bnd_y_down'] + j * (r / 2) and \
+                        dense_square['bnd_y_up'] == sparse_square['bnd_y_up'] + j * (r / 2):
+                    return True
+    return False
+    
+    
 # -----------------------------------------------------------------------------------------------------------
 # Print functions
 
