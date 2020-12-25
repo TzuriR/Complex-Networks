@@ -1,4 +1,61 @@
 # -----------------------------------------------------------------------------------------------------------
+# Build g'
+
+def build_g_tag(net, groups_on_grid, threshold):
+    g_tag = nx.Graph()
+    # Add vertices to the g_tag
+    counter = 0
+    for sq in groups_on_grid:
+        if sq['degree'] != 0:
+            g_tag.add_node(counter)
+            sq['index_gtag'] = counter
+            counter += 1
+            print("g_tag point number:", sq['index_gtag'], "number of square:", sq['i'])
+    # Run all over groups_on_grid in 2 loops
+    # If they both sparse -> continue (we dont want to connect sparse square to each other)
+    # Else : check if there is an edge between the two groups -> add edge between the squares to g_tag
+    for sq1 in groups_on_grid:
+        for sq2 in groups_on_grid:
+            if sq1['degree'] <= threshold and sq2['degree'] <= threshold:
+                continue
+            if are_squares_connected(net, sq1, sq2):
+                g_tag.add_edge(sq1['index_gtag'], sq2['index_gtag'])
+    return g_tag
+    
+# -----------------------------------------------------------------------------------------------------------
+
+def are_squares_connected(net, sq1, sq2):
+    for p1 in sq1['arr_points']:
+        for p2 in sq2['arr_points']:
+            if net.is_at_edge_by_points(net.edges, p1.serial_number, p2.serial_number) == True:
+                return True
+    return False
+
+# -----------------------------------------------------------------------------------------------------------
+# Get a network, a point and list containing the friends of the square p where p is
+# Return a list of flag two points assign to the current point
+
+def build_pair(net, p, list_of_friends, curr_degree):
+    in_out_list = []
+    flag = 0
+    for sq in list_of_friends:
+        for point in sq['arr_points']:
+            if net.is_at_edge_by_points(net.edges, point.serial_number, p.serial_number) == True:
+                square_point_list = []
+                square_point_list.append(sq)
+                square_point_list(point)
+                sq['degree'] -= 1
+                in_out_list.append(square_point_list)
+                if curr_degree == 1:
+                    if flag == 1:
+                        return in_out_list
+                    flag = 1
+                    continue
+                else:
+                    return in_out_list
+    return in_out_list
+    
+ # -----------------------------------------------------------------------------------------------------------
 # Get group and index and return the square of its index
 
 def find_square_by_point(groups_on_grid, index):
