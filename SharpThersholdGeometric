@@ -1,3 +1,26 @@
+
+# -----------------------------------------------------------------------------------------------------------
+# Return np.array after filtering the points, only points within the current sector will be inside
+
+def subgroup_by_condition(arr_of_nodes, bnd_x_down, bnd_x_up, bnd_y_down, bnd_y_up):
+    """subgrp_lst = []
+        for i in range(0, len(group)):
+            if group[i].x_value >= bnd_x_down and group[i].x_value < bnd_x_up and group[i].y_value >= bnd_y_down and group[i].y_value < bnd_y_up:
+                subgrp_lst.append(group[i])
+        return np.array(subgrp_lst)"""
+    return np.array(list(filter(
+        lambda p: bnd_x_down <= p.x_value < bnd_x_up and bnd_y_down <= p.y_value < bnd_y_up,
+        arr_of_nodes)))
+
+# -----------------------------------------------------------------------------------------------------------
+# Get arr_nodes and check if dense
+
+def is_dense(arr_points, n, r):
+    threshold = calculate_threshold(n, r)
+    if len(arr_points) > threshold:
+        return True
+    return False
+    
 # -----------------------------------------------------------------------------------------------------------
 # Divide groups_on_grid to sparse and dense
 
