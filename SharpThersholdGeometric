@@ -1,3 +1,22 @@
+
+# -----------------------------------------------------------------------------------------------------------
+# Print functions
+
+def print_squares_arr(squares_arr):
+    for i, sq in enumerate(squares_arr):
+        print("square number : i =", i)
+        print_point_arr(sq)
+
+def print_list_of_dict(list_of_dict):
+    for i in range(len(list_of_dict)):
+        print("i =", list_of_dict[i]['i'], ",boundaries of x:", list_of_dict[i]['bnd_x_down'], ",", list_of_dict[i]['bnd_x_up'], "boundaries of y:", list_of_dict[i]['bnd_y_down'],
+              ",", list_of_dict[i]['bnd_y_up'])
+        print_point_arr(list_of_dict[i]['arr_points'])
+
+def print_point_arr(point_arr):
+    for i in range(0, len(point_arr)):
+        point_arr[i].print_point()
+
 # -----------------------------------------------------------------------------------------------------------
 # main
 
