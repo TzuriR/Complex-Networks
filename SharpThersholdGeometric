@@ -1,4 +1,78 @@
 # -----------------------------------------------------------------------------------------------------------
+# Divide groups_on_grid to sparse and dense
+
+def divide_dense_from_sparse(groups_on_grid, n, r):
+    dense_group = []
+    sparse_group = []
+    for i in range(len(groups_on_grid)):
+        if is_dense(groups_on_grid[i]['arr_points'], n, r):
+            dense_group.append(groups_on_grid[i])
+        else:
+            sparse_group.append(groups_on_grid[i])
+    '''for group in groups_on_grid:
+        if is_dense(group, n, r):
+            dense_group.append(group)
+        else:
+            sparse_group.append(group)'''
+    return dense_group, sparse_group  # lists of dictionaries
+
+
+# -----------------------------------------------------------------------------------------------------------
+# Connect between every point in a sparse square to a dense square
+
+def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group,
+                                r):  # To match to a square or to a point??
+    # ???
+    """sparse_point_list = []
+    for sparse_square in sparse_group:
+        for p in sparse_square:
+            sparse_point_list.append(p)"""
+    # for p in sparse_point_list:
+
+    '''
+    For i in range (-2, 3)#without himself
+      For j in range (-2, 3)
+    1)In dense squares if boundaries x = i*myboundry  and y = j*myboundry insert to my friends 
+    2)For every point in me try to match a point that is connected to me (do not go through all point in it)
+    '''
+
+    # Dictionary that contains lists of dense friends of each sparse square
+    friends_dict = {}
+    for sparse_index, sparse_square in enumerate(sparse_group):
+        # For each sparse square get his friends(at most 24)
+        curr_friends = []
+        for dense_index, dense_square in enumerate(dense_group):
+            if is_friend(sparse_square, dense_square, r):
+                curr_friends.append(dense_square)
+        print("The list of friends of i =", sparse_square['i'], "is :")
+        print_list_of_dict(curr_friends)
+        friends_dict[str(sparse_index)] = curr_friends
+        print("#####################################################")
+    # filtered_list = list(filter(lambda dense_square: is_friend(sparse_square, dense_square), dense_group))
+    # print("The list of friends of i =",index, "is :" ,filtered_list)
+
+    # Initialize data structures : dictionary by the length of the sparse group
+    # For each sparse there will be a dictionary for all its vertices
+    # For each vertex there will be a list containing two vertices connecting to this vertex by the greedy algorithm
+    # The efficiency is linear because the length of the sparse square is very low
+    # In addition, the sum of the lengths of each dictionary is the number of nodes in g_tag
+
+    dict_labels = {}
+    for curr_square in sparse_group:
+        dict_square = {}
+        serial_str_sq = str(curr_square['i'])
+        for p in curr_square['arr_points']:
+            serial_str_point = str(p.serial_number)
+            dict_square[serial_str_point] = build_pair(net, p, friends_dict[serial_str_sq], curr_square['degree'])
+        dict_labels[serial_str_sq] = dict_square
+
+    # Run all over the sparse squares and insert an edge to g_tag between the square and its friend if they are connected
+    for k in friends_dict.keys():
+        num_of_sparse = int(k)
+        list_of_sparse_sq = friends_dict[k]
+        
+        
+# -----------------------------------------------------------------------------------------------------------
 # Build g'
 
 def build_g_tag(net, groups_on_grid, threshold):
