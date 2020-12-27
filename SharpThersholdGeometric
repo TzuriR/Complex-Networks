@@ -4,11 +4,10 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-
 # -----------------------------------------------------------------------------------------------------------
 # Divide the unit cube into sectors depends on the value of r
 
-def divide_to_grid(net, r):
+def divide_to_grid(net, n, r):
     num_of_groups = int(np.floor((2 / r) ** 2))
     num_of_one_side = int(np.floor((2 / r)))
     arr_of_nodes = np.array(net.nodes)
@@ -25,12 +24,12 @@ def divide_to_grid(net, r):
             arr = subgroup_by_condition(arr_of_nodes, x * (r / 2), (x + 1) * (r / 2), y * (r / 2), (y + 1) * (r / 2))
             dict_square = {'i': i, 'arr_points': arr, 'bnd_x_down': x * (r / 2), 'bnd_x_up': (x + 1) * (r / 2),
                            'bnd_y_down': y * (r / 2), 'bnd_y_up': (y + 1) * (r / 2), 'degree': len(arr),
-                           'index_gtag': -1}
+                           'index_gtag': -1, 'is_den': is_dense(arr, n, r)}
             groups_on_grid.append(dict_square)
-            # groups.append(arr)
+            #groups.append(arr)
             i += 1
-    # print_squares_arr(groups)
-    return groups_on_grid  # list od dictionary
+    #print_squares_arr(groups)
+    return groups_on_grid #list od dictionary
 
 
 # -----------------------------------------------------------------------------------------------------------
@@ -54,7 +53,6 @@ def subgroup_by_condition(arr_of_nodes, bnd_x_down, bnd_x_up, bnd_y_down, bnd_y_
         lambda p: bnd_x_down <= p.x_value < bnd_x_up and bnd_y_down <= p.y_value < bnd_y_up,
         arr_of_nodes)))
 
-
 # -----------------------------------------------------------------------------------------------------------
 # Get arr_nodes and check if dense
 
@@ -64,37 +62,29 @@ def is_dense(arr_points, n, r):
         return True
     return False
 
-
 # -----------------------------------------------------------------------------------------------------------
 # Divide groups_on_grid to sparse and dense
 
-def divide_dense_from_sparse(groups_on_grid, n, r):
+def divide_dense_from_sparse(groups_on_grid):
     dense_group = []
     sparse_group = []
     for i in range(len(groups_on_grid)):
-        if is_dense(groups_on_grid[i]['arr_points'], n, r):
+        if groups_on_grid[i]['is_den']:
             dense_group.append(groups_on_grid[i])
         else:
             sparse_group.append(groups_on_grid[i])
-    '''for group in groups_on_grid:
-        if is_dense(group, n, r):
-            dense_group.append(group)
-        else:
-            sparse_group.append(group)'''
-    return dense_group, sparse_group  # lists of dictionaries
-
+    return dense_group, sparse_group #lists of dictionaries
 
 # -----------------------------------------------------------------------------------------------------------
 # Connect between every point in a sparse square to a dense square
 
-def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group,
-                                r):  # To match to a square or to a point??
+def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group, r):  # To match to a square or to a point??
     # ???
-    """sparse_point_list = []
+    '''sparse_point_list = []
     for sparse_square in sparse_group:
         for p in sparse_square:
-            sparse_point_list.append(p)"""
-    # for p in sparse_point_list:
+            sparse_point_list.append(p)'''
+    #for p in sparse_point_list:
 
     '''
     For i in range (-2, 3)#without himself
@@ -109,7 +99,7 @@ def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group,
         # For each sparse square get his friends(at most 24)
         curr_friends = []
         for dense_index, dense_square in enumerate(dense_group):
-            if is_friend(sparse_square, dense_square, r):
+            if is_friend(sparse_square, dense_square, r) == True:
                 curr_friends.append(dense_square)
         print("The list of friends of i =", sparse_square['i'], "is :")
         print_list_of_dict(curr_friends)
@@ -117,6 +107,8 @@ def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group,
         print("#####################################################")
     # filtered_list = list(filter(lambda dense_square: is_friend(sparse_square, dense_square), dense_group))
     # print("The list of friends of i =",index, "is :" ,filtered_list)
+
+
 
     # Initialize data structures : dictionary by the length of the sparse group
     # For each sparse there will be a dictionary for all its vertices
@@ -133,6 +125,7 @@ def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group,
             dict_square[serial_str_point] = build_pair(net, p, friends_dict[serial_str_sq], curr_square['degree'])
         dict_labels[serial_str_sq] = dict_square
 
+
     # Run all over the sparse squares and insert an edge to g_tag between the square and its friend if they are connected
     for k in friends_dict.keys():
         num_of_sparse = int(k)
@@ -142,7 +135,35 @@ def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group,
 # -----------------------------------------------------------------------------------------------------------
 # Build g'
 
-def build_g_tag(net, groups_on_grid, threshold):
+def build_g_tag(net, dense_group, threshold):
+    '''
+     dict_square = {'i': i, 'arr_points': arr, 'bnd_x_down': x * (r / 2), 'bnd_x_up': (x + 1) * (r / 2),
+                           'bnd_y_down': y * (r / 2), 'bnd_y_up': (y + 1) * (r / 2), 'degree': len(arr),
+                           'index_gtag': -1, 'is_den': is_dense(arr, n, r)}
+    '''
+    g_tag = nx.Graph()
+    # Add vertices to the g_tag
+    counter = 0
+    for sq in dense_group:
+        if sq['degree'] != 0:
+            pos_x = (0.5)*(sq['bnd_x_down'] + sq['bnd_x_up'])
+            pos_y = (0.5) * (sq['bnd_y_down'] + sq['bnd_y_up'])
+            g_tag.add_node(counter, pos=(pos_x, pos_y))
+            sq['index_gtag'] = counter
+            counter += 1
+            print("g_tag point number:", sq['index_gtag'], "number of square:", sq['i'], "degree:", sq['degree'])
+
+    # Run all over groups_on_grid in 2 loops
+    # If they both sparse -> continue (we dont want to connect sparse square to each other)
+    # Else : check if there is an edge between the two groups -> add edge between the squares to g_tag
+    for sq1 in dense_group:
+        for sq2 in dense_group:
+            if sq1 != sq2 and g_tag.has_edge(sq2['index_gtag'], sq1['index_gtag'])==False and are_squares_connected(net, sq1, sq2):
+                g_tag.add_edge(sq1['index_gtag'], sq2['index_gtag'], weight=sq1['degree']+sq2['degree'])
+                print("Weight of (", sq1['index_gtag'], ",", sq2['index_gtag'], ") is :", sq1['degree']+sq2['degree'])
+    return g_tag
+
+'''def build_g_tag(net, groups_on_grid, threshold):
     g_tag = nx.Graph()
     # Add vertices to the g_tag
     counter = 0
@@ -161,167 +182,4 @@ def build_g_tag(net, groups_on_grid, threshold):
                 continue
             if are_squares_connected(net, sq1, sq2):
                 g_tag.add_edge(sq1['index_gtag'], sq2['index_gtag'])
-    return g_tag
-
-
-# -----------------------------------------------------------------------------------------------------------
-
-
-def are_squares_connected(net, sq1, sq2):
-    for p1 in sq1['arr_points']:
-        for p2 in sq2['arr_points']:
-            if net.is_at_edge_by_points(net.edges, p1.serial_number, p2.serial_number):
-                return True
-    return False
-
-
-# -----------------------------------------------------------------------------------------------------------
-# Get a network, a point and list containing the friends of the square p where p is
-# Return a list of flag two points assign to the current point
-
-def build_pair(net, p, list_of_friends, curr_degree):
-    in_out_list = []
-    flag = 0
-    for sq in list_of_friends:
-        for point in sq['arr_points']:
-            square_point_list = []
-            if net.is_at_edge_by_points(net.edges, point.serial_number, p.serial_number):
-                square_point_list.append(sq)
-                square_point_list.append(point)
-                sq['degree'] -= 1
-                in_out_list.append(square_point_list)
-                if curr_degree == 1:
-                    if flag == 1:
-                        return in_out_list
-                    flag = 1
-                    continue
-                else:
-                    return in_out_list
-    return in_out_list
-
-
-# -----------------------------------------------------------------------------------------------------------
-# Get group and index and return the square of its index
-
-def find_square_by_point(groups_on_grid, index):
-    if index < 0 or index >= len(groups_on_grid):
-        return np.nan
-    for sq in groups_on_grid:
-        if sq['index_gtag'] == index:
-            return sq
-    return np.nan
-
-
-# -----------------------------------------------------------------------------------------------------------
-# Return if the squares are friends
-
-def is_friend(sparse_square, dense_square, r):
-    for i in range(-2, 3):
-        for j in range(-2, 3):
-            '''print("dense_square['bnd_x_down'] :", dense_square['bnd_x_down'])
-            print("sparse_square['bnd_x_down'] + i*(r/2) :", sparse_square['bnd_x_down'] + i*(r/2))
-            print("dense_square['bnd_x_up'] :", dense_square['bnd_x_up'])
-            print("sparse_square['bnd_x_up'] + i*(r/2) :", sparse_square['bnd_x_up'] + i*(r/2))
-            print("dense_square['bnd_y_down'] :", dense_square['bnd_y_down'])
-            print("sparse_square['bnd_y_down'] + i*(r/2) :", sparse_square['bnd_y_down'] + i*(r/2))
-            print("dense_square['bnd_y_up'] :", dense_square['bnd_y_up'])
-            print("sparse_square['bnd_y_up'] + i*(r/2) :", sparse_square['bnd_y_up'] + i*(r/2))'''
-            if dense_square['bnd_x_down'] == sparse_square['bnd_x_down'] + i * (r / 2) and \
-                    dense_square['bnd_x_up'] == sparse_square['bnd_x_up'] + i * (r / 2):
-                if dense_square['bnd_y_down'] == sparse_square['bnd_y_down'] + j * (r / 2) and \
-                        dense_square['bnd_y_up'] == sparse_square['bnd_y_up'] + j * (r / 2):
-                    return True
-    return False
-
-
-# -----------------------------------------------------------------------------------------------------------
-# Print functions
-
-def print_squares_arr(squares_arr):
-    for i, sq in enumerate(squares_arr):
-        print("square number : i =", i)
-        print_point_arr(sq)
-
-
-def print_list_of_dict(list_of_dict):
-    for i in range(len(list_of_dict)):
-        print("i =", list_of_dict[i]['i'], ",boundaries of x:", list_of_dict[i]['bnd_x_down'], ",",
-              list_of_dict[i]['bnd_x_up'], "boundaries of y:", list_of_dict[i]['bnd_y_down'],
-              ",", list_of_dict[i]['bnd_y_up'])
-        print_point_arr(list_of_dict[i]['arr_points'])
-
-
-def print_point_arr(point_arr):
-    for i in range(0, len(point_arr)):
-        point_arr[i].print_point()
-
-
-# -----------------------------------------------------------------------------------------------------------
-# main
-
-def main():
-    r = 0.5
-    n = 20
-    net = ge_net.Network(r)
-    for i in range(0, n):
-        p = pnt.Point(i)
-        net.add_vertex(p)
-    net.make_edges()
-    net.draw_network()
-    groups_on_grid = divide_to_grid(net, r)
-    print("========================================================================================")
-    print("groups_on_grid:")
-    print_list_of_dict(groups_on_grid)
-    # Make sure num_of_squares is squared!!!!!!!!!!!!!!!!!!
-    threshold = calculate_threshold(n, r)
-    print("========================================================================================")
-    print("threshold:", threshold)
-    dense_group, sparse_group = divide_dense_from_sparse(groups_on_grid, n, r)
-    print("========================================================================================")
-    print("Dense group:")
-    print_list_of_dict(dense_group)
-    print("========================================================================================")
-    print("Sparse group:")
-    print_list_of_dict(sparse_group)
-    # print("========================================================================================")
-    # label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group, r)
-    print("========================================================================================")
-    g_tag = build_g_tag(net, groups_on_grid, threshold)
-    nx.draw(g_tag, with_labels=True)
-    plt.savefig("g_tag_drawing.png")
-    plt.show()
-
-
-if __name__ == '__main__':
-    main()
-
-'''groups = np.empty(shape=num_of_groups, dtype=np.ndarray)
-    print(type(groups))
-    arr = subgroup_by_condition(arr_of_nodes, 0, 0.25, 0, 0.25)
-    groups = np.array([arr])
-    print("arr:")
-    print_point_arr(arr)
-    groups = np.vstack((groups, arr))
-    print("groups:")
-    print_squares_arr(groups)
-    arr1 = subgroup_by_condition(arr_of_nodes, 0.25, 0.5, 0.25, 0.5)
-    print("arr1:")
-    print_point_arr(arr1)
-    groups = np.vstack((groups, arr1))
-    print("groups:")
-    print_squares_arr(groups)
-    arr_of_nodes = np.array(net.nodes)
-    print_point_arr(arr_of_nodes)
-    temp = arr_of_nodes[(arr_of_nodes, )]
-    groups = np.array(temp)
-    groups = np.empty(num_of_groups)
-    #groups[:] = np.nan
-    p0 = pnt.Point(0)
-    p1 = pnt.Point(1)
-    arr1 = np.array([p0, p1])
-    p2 = pnt.Point(2)
-    p3 = pnt.Point(3)
-    arr2 = np.array([p2, p3])
-    arr = np.array([arr1])
-    arr = np.vstack((arr, arr2))
-    print_squares_arr(arr)'''
+    return g_tag'''
