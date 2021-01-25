@@ -17,4 +17,4 @@ class Point:
             self.y_value = y
 
     def print_point(self):
-        print("Point", self.serial_number, "x:", self.x_value, "y:", self.y_value)
+        print("Point", self.serial_number, ": x =", self.x_value, ",y =", self.y_value)
