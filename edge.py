@@ -1,12 +1,12 @@
-import Point
+import point
 
 
 class Edge:
-    vtx_1: Point  # a vertex
-    vtx_2: Point  # a vertex
+    vtx_1: point  # a vertex
+    vtx_2: point  # a vertex
     serial_number: int = -1
 
-    def __init__(self, vtx1: Point, vtx2: Point, num: int):
+    def __init__(self, vtx1: point, vtx2: point, num: int):
         if vtx1 == vtx2:
             print("edges' points are the same one")
             return
