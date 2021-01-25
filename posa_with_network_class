@@ -1,15 +1,12 @@
-import Point as pnt
-import Edge as edg
+# This file include posa algorithm with the network class
 
-#This file include posa algoritm with the network class
-
-#Changes to do : (1) Use the adj matrix from net (2) Make rail adj matrix (3) Use serial_number in is_at()
+# Changes to do : (1) Use the adj matrix from net (2) Make rail adj matrix (3) Use serial_number in is_at()
 
 # Posa algorithm
 def posa(net):
     # Step 1-------------------------------------------------------
     print("Start of step 1:")
-    n = len(net.nodes)
+    # n = len(net.nodes)
     rail_v = []
     rail_e = []
     # We are starting from the first node - insert it to the rail and call to utility function
@@ -65,9 +62,9 @@ def make_cycle(net, rail_v, rail_e):
     # If there is (x0, xn) - add it to the rail and finish
     if (is_at(net.edges, (rail_v[0], rail_v[len(rail_v) - 1])) == 1) or (
             is_at(net.edges, (rail_v[len(rail_v) - 1], rail_v[0])) == 1):
-        edgeTemp = net.find_edge_between_vertices(rail_v[len(rail_v) - 1], rail_v[0])
-        rail_e.append(edgeTemp)
-        #rail_e.append((rail_v[len(rail_v) - 1], rail_v[0]))
+        edge_temp = net.find_edge_between_vertices(rail_v[len(rail_v) - 1], rail_v[0])
+        rail_e.append(edge_temp)
+        # rail_e.append((rail_v[len(rail_v) - 1], rail_v[0]))
         return rail_v, rail_e
     i = 0
     flag = 0
@@ -105,27 +102,27 @@ def swap_cycle(net, x0, xi, xi_plus_one, xn, rail_v, rail_e):
     while rail_v[index] != xi_plus_one:
         temp_v.append(rail_v[index])
         if index != 0:
-            edgeTemp = net.find_edge_between_vertices(rail_v[index - 1], rail_v[index])
-            rail_e.append(edgeTemp)
-            #temp_e.append((rail_v[index - 1], rail_v[index]))
+            edge_temp = net.find_edge_between_vertices(rail_v[index - 1], rail_v[index])
+            rail_e.append(edge_temp)
+            # temp_e.append((rail_v[index - 1], rail_v[index]))
         index += 1
     temp_v.append(xn)
-    edgeTemp1 = net.find_edge_between_vertices(xi, xn)
-    rail_e.append(edgeTemp1)
-    #temp_e.append((xi, xn))
+    edge_temp_1 = net.find_edge_between_vertices(xi, xn)
+    rail_e.append(edge_temp_1)
+    # temp_e.append((xi, xn))
     # endIndex run on rail_v, index run on tempV
     index += 1
     end_index = len(rail_v) - 2
     while end_index >= rail_v.index(xi_plus_one):
         temp_v.append(rail_v[end_index])
-        edgeTemp2 = net.find_edge_between_vertices(rail_v[end_index + 1], rail_v[end_index])
-        rail_e.append(edgeTemp2)
-        #temp_e.append((rail_v[end_index + 1], rail_v[end_index]))  # How direct from rail_e?
+        edge_temp_2 = net.find_edge_between_vertices(rail_v[end_index + 1], rail_v[end_index])
+        rail_e.append(edge_temp_2)
+        # temp_e.append((rail_v[end_index + 1], rail_v[end_index]))  # How direct from rail_e?
         end_index -= 1
         index += 1
-    edgeTemp3 = net.find_edge_between_vertices(xi_plus_one, x0)
-    rail_e.append(edgeTemp3)
-    #temp_e.append((xi_plus_one, x0))
+    edge_temp_3 = net.find_edge_between_vertices(xi_plus_one, x0)
+    rail_e.append(edge_temp_3)
+    # temp_e.append((xi_plus_one, x0))
     rail_v = temp_v
     rail_e = temp_e
     return rail_v, rail_e
@@ -139,9 +136,9 @@ def rot_ext(net, rail_v, rail_e):
     # Run all over x's neighbors and insert them into arrays
     adj_x = []
     for e in net.edges:
-        if e.vtx_1.serial_number == xt.serial_number :
+        if e.vtx_1.serial_number == xt.serial_number:
             adj_x.append(e.vtx_2)
-        if e.vtx_2.serial_number == xt.serial_number :
+        if e.vtx_2.serial_number == xt.serial_number:
             adj_x.append(e.vtx_1)
 
     # Do the extension rotation
@@ -165,7 +162,7 @@ def rot_ext(net, rail_v, rail_e):
             if is_at(rail_v, xk) == 1:
                 continue
             # Call utility function that to the swap - add the edge (xi+1, xk), (xi,xt) and delete the edge (xi+1, xk)
-            rail_v, rail_e = swap_rail(net, xi, xi_plus_one, xk, xt, rail_v, rail_e)
+            rail_v, rail_e = swap_rail(net, xi, xi_plus_one, xk, xt, rail_v)
             flag = 1  # we back from swap
             break
         break
@@ -177,35 +174,35 @@ def rot_ext(net, rail_v, rail_e):
 # --------------------------------------------------------------------------------
 # Utility function: do the swap of the rotation extension
 
-def swap_rail(net, xi, xi_plus_one, xk, xt, rail_v, rail_e):
+def swap_rail(net, xi, xi_plus_one, xk, xt, rail_v):
     temp_v = []
     temp_e = []
     index = 0
     while rail_v[index] != xi_plus_one:
         temp_v.append(rail_v[index])
         if index != 0:
-            edgeTemp = net.find_edge_between_vertices(rail_v[index - 1], rail_v[index])
-            temp_e.append(edgeTemp)
-            #temp_e.append((rail_v[index - 1], rail_v[index]))
+            edge_temp = net.find_edge_between_vertices(rail_v[index - 1], rail_v[index])
+            temp_e.append(edge_temp)
+            # temp_e.append((rail_v[index - 1], rail_v[index]))
         index += 1
     temp_v.append(xt)
-    edgeTemp = net.find_edge_between_vertices(xi, xt)
-    temp_e.append(edgeTemp)
-    #temp_e.append((xi, xt))
+    edge_temp = net.find_edge_between_vertices(xi, xt)
+    temp_e.append(edge_temp)
+    # temp_e.append((xi, xt))
     # endIndex run on rail_v, index run on tempV
     index += 1
     end_index = len(rail_v) - 2
     while end_index >= rail_v.index(xi_plus_one):
         temp_v.append(rail_v[end_index])
-        edgeTemp = net.find_edge_between_vertices(rail_v[end_index + 1], rail_v[end_index])
-        temp_e.append(edgeTemp)
-        #temp_e.append((rail_v[end_index + 1], rail_v[end_index]))  # How direct from rail_e?
+        edge_temp = net.find_edge_between_vertices(rail_v[end_index + 1], rail_v[end_index])
+        temp_e.append(edge_temp)
+        # temp_e.append((rail_v[end_index + 1], rail_v[end_index]))  # How direct from rail_e?
         end_index -= 1
         index += 1
     temp_v.append(xk)
-    edgeTemp = net.find_edge_between_vertices(xi_plus_one, xk)
-    temp_e.append(edgeTemp)
-    #temp_e.append((xi_plus_one, xk))
+    edge_temp = net.find_edge_between_vertices(xi_plus_one, xk)
+    temp_e.append(edge_temp)
+    # temp_e.append((xi_plus_one, xk))
     rail_v = temp_v
     rail_e = temp_e
     return rail_v, rail_e
@@ -226,8 +223,8 @@ def insert_to_rail(net, x, rail_v, rail_e):
     for y in adj_x:
         if is_at(rail_v, y) == 0:
             rail_v.append(y)
-            edgeTemp = net.find_edge_between_vertices(x, y)
-            rail_e.append(edgeTemp)
+            edge_temp = net.find_edge_between_vertices(x, y)
+            rail_e.append(edge_temp)
             rail_v, rail_e = insert_to_rail(net, y, rail_v, rail_e)
             break
     return rail_v, rail_e
