@@ -1,14 +1,18 @@
-import geometricNetwork as ge_net
-import Point as pnt
+import geometric_network as Ge_net
+import point as Pnt
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+
+
+# import random as rd
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Divide the unit cube into sectors depends on the value of r
 
 def divide_to_grid(net, n, r):
-    num_of_groups = int(np.floor((2 / r) ** 2))
+    # num_of_groups = int(np.floor((2 / r) ** 2))
     num_of_one_side = int(np.floor((2 / r)))
     arr_of_nodes = np.array(net.nodes)
 
@@ -26,10 +30,10 @@ def divide_to_grid(net, n, r):
                            'bnd_y_down': y * (r / 2), 'bnd_y_up': (y + 1) * (r / 2), 'degree': len(arr),
                            'index_graph': -1, 'is_den': is_dense(arr, n, r)}
             groups_on_grid.append(dict_square)
-            #groups.append(arr)
+            # groups.append(arr)
             i += 1
-    #print_squares_arr(groups)
-    return groups_on_grid #list od dictionary
+    # print_squares_arr(groups)
+    return groups_on_grid  # list od dictionary
 
 
 # -----------------------------------------------------------------------------------------------------------
@@ -53,6 +57,7 @@ def subgroup_by_condition(arr_of_nodes, bnd_x_down, bnd_x_up, bnd_y_down, bnd_y_
         lambda p: bnd_x_down <= p.x_value < bnd_x_up and bnd_y_down <= p.y_value < bnd_y_up,
         arr_of_nodes)))
 
+
 # -----------------------------------------------------------------------------------------------------------
 # Get arr_nodes and check if dense
 
@@ -61,6 +66,7 @@ def is_dense(arr_points, n, r):
     if len(arr_points) > threshold:
         return True
     return False
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Divide groups_on_grid to sparse and dense
@@ -73,18 +79,20 @@ def divide_dense_from_sparse(groups_on_grid):
             dense_group.append(groups_on_grid[i])
         else:
             sparse_group.append(groups_on_grid[i])
-    return dense_group, sparse_group #lists of dictionaries
+    return dense_group, sparse_group  # lists of dictionaries
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Connect between every point in a sparse square to a dense square
 
-def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group, r):  # To match to a square or to a point??
+def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group,
+                                r):  # To match to a square or to a point??
     # ???
-    '''sparse_point_list = []
+    """sparse_point_list = []
     for sparse_square in sparse_group:
         for p in sparse_square:
-            sparse_point_list.append(p)'''
-    #for p in sparse_point_list:
+            sparse_point_list.append(p)"""
+    # for p in sparse_point_list:
 
     '''
     For i in range (-2, 3)#without himself
@@ -99,7 +107,7 @@ def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group, 
         # For each sparse square get his friends(at most 24)
         curr_friends = []
         for dense_square in dense_group:
-            if is_friend(sparse_square, dense_square, r) == True:
+            if is_friend(sparse_square, dense_square, r):
                 curr_friends.append(dense_square)  # curr_friends can be empty - if the square is empty
         print("The list of friends of i =", sparse_square['i'], "is :")
         print_list_of_dict(curr_friends)
@@ -117,8 +125,6 @@ def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group, 
         print("#####################################################")'''
     # filtered_list = list(filter(lambda dense_square: is_friend(sparse_square, dense_square), dense_group))
     # print("The list of friends of i =",index, "is :" ,filtered_list)
-
-
 
     # Initialize data structures : dictionary by the length of the sparse group
     # For each sparse there will be a dictionary for all its vertices
@@ -142,37 +148,44 @@ def label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group, 
         list_of_sparse_sq = friends_dict[k]'''
 
     return friends_dict
+
+
 # -----------------------------------------------------------------------------------------------------------
 # Build g'
 
 def build_g_tag(net, dense_group, threshold):
-    '''
+    """
      dict_square = {'i': i, 'arr_points': arr, 'bnd_x_down': x * (r / 2), 'bnd_x_up': (x + 1) * (r / 2),
                            'bnd_y_down': y * (r / 2), 'bnd_y_up': (y + 1) * (r / 2), 'degree': len(arr),
                            'index_graph': -1, 'is_den': is_dense(arr, n, r)}
-    '''
+    """
     g_tag = nx.Graph()
     # Add vertices to the g_tag
     counter = 0
     for sq in dense_group:
         if sq['degree'] != 0:
-            pos_x = (0.5)*(sq['bnd_x_down'] + sq['bnd_x_up'])
-            pos_y = (0.5) * (sq['bnd_y_down'] + sq['bnd_y_up'])
+            pos_x = 0.5 * (sq['bnd_x_down'] + sq['bnd_x_up'])
+            pos_y = 0.5 * (sq['bnd_y_down'] + sq['bnd_y_up'])
             g_tag.add_node(counter, pos=(pos_x, pos_y))
             sq['index_graph'] = counter
             counter += 1
             print("g_tag point number:", sq['index_graph'], "number of square:", sq['i'], "degree:", sq['degree'])
 
     # Run all over groups_on_grid in 2 loops
-    # If they both sparse -> continue (we dont want to connect sparse square to each other)
+    # If they both sparse -> continue (we don't want to connect sparse square to each other)
     # Else : check if there is an edge between the two groups -> add edge between the squares to g_tag
     for sq1 in dense_group:
         for sq2 in dense_group:
-            if sq1 != sq2 and g_tag.has_edge(sq2['index_graph'], sq1['index_graph'])==False and are_squares_connected(net, sq1, sq2):
-            # if sq1 != sq2 and are_squares_connected(net, sq1, sq2):
-                g_tag.add_edge(sq1['index_graph'], sq2['index_graph'], weight=sq1['degree']+sq2['degree'])
-                print("Weight of (", sq1['index_graph'], ",", sq2['index_graph'], ") is :", sq1['degree']+sq2['degree'])
+            if sq1 != sq2 and g_tag.has_edge(sq2['index_graph'], sq1['index_graph']) == False and are_squares_connected(
+                    net, sq1, sq2):
+                # if sq1 != sq2 and are_squares_connected(net, sq1, sq2):
+                # g_tag.add_edge(sq1['index_graph'], sq2['index_graph'], weight=sq1['degree']+sq2['degree'])
+                # Try - random weight
+                w = abs(sq1['bnd_x_up'] - sq2['bnd_x_up']) + abs(sq1['bnd_y_up'] - sq2['bnd_y_up'])
+                g_tag.add_edge(sq1['index_graph'], sq2['index_graph'], weight=w)
+                print("Weight of (", sq1['index_graph'], ",", sq2['index_graph'], ") is :", w)
     return g_tag
+
 
 '''def build_g_tag(net, groups_on_grid, threshold):
     g_tag = nx.Graph()
@@ -185,7 +198,7 @@ def build_g_tag(net, dense_group, threshold):
             counter += 1
             print("g_tag point number:", sq['index_graph'], "number of square:", sq['i'])
     # Run all over groups_on_grid in 2 loops
-    # If they both sparse -> continue (we dont want to connect sparse square to each other)
+    # If they both sparse -> continue (we don't want to connect sparse square to each other)
     # Else : check if there is an edge between the two groups -> add edge between the squares to g_tag
     for sq1 in groups_on_grid:
         for sq2 in groups_on_grid:
@@ -195,15 +208,17 @@ def build_g_tag(net, dense_group, threshold):
                 g_tag.add_edge(sq1['index_graph'], sq2['index_graph'])
     return g_tag'''
 
+
 # -----------------------------------------------------------------------------------------------------------
 # Get two squares and return point 1 in square 1 connected to point 2 in square 2
 
 def points_connect_between_squares(net, sq1, sq2):
     for p1 in sq1['arr_points']:
         for p2 in sq2['arr_points']:
-            if net.is_at_edge_by_points(net.edges, p1.serial_number, p2.serial_number) == True:
+            if net.is_at_edge_by_points(net.edges, p1.serial_number, p2.serial_number):
                 return p1.serial_number, p2.serial_number
     return -1, -1
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Get two squares and return true if its connected
@@ -211,9 +226,10 @@ def points_connect_between_squares(net, sq1, sq2):
 def are_squares_connected(net, sq1, sq2):
     for p1 in sq1['arr_points']:
         for p2 in sq2['arr_points']:
-            if net.is_at_edge_by_points(net.edges, p1.serial_number, p2.serial_number) == True:
+            if net.is_at_edge_by_points(net.edges, p1.serial_number, p2.serial_number):
                 return True
     return False
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Get a network, a point and list containing the friends of the square p where p is
@@ -224,10 +240,9 @@ def build_pair(net, p, list_of_friends, curr_degree):
     flag = 0
     for sq in list_of_friends:
         for point in sq['arr_points']:
-            if net.is_at_edge_by_points(net.edges, point.serial_number, p.serial_number) == True:
+            if net.is_at_edge_by_points(net.edges, point.serial_number, p.serial_number):
                 square_point_list = []
                 square_point_list.append(sq)
-                square_point_list(point)
                 sq['degree'] -= 1
                 in_out_list.append(square_point_list)
                 if curr_degree == 1:
@@ -238,6 +253,7 @@ def build_pair(net, p, list_of_friends, curr_degree):
                 else:
                     return in_out_list
     return in_out_list
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Get group and index and return the square of its index
@@ -266,8 +282,10 @@ def is_friend(sparse_square, dense_square, r):
             print("sparse_square['bnd_y_down'] + i*(r/2) :", sparse_square['bnd_y_down'] + i*(r/2))
             print("dense_square['bnd_y_up'] :", dense_square['bnd_y_up'])
             print("sparse_square['bnd_y_up'] + i*(r/2) :", sparse_square['bnd_y_up'] + i*(r/2))'''
-            if dense_square['bnd_x_down'] == sparse_square['bnd_x_down'] + i*(r/2) and dense_square['bnd_x_up'] == sparse_square['bnd_x_up'] + i*(r/2):
-                if dense_square['bnd_y_down'] == sparse_square['bnd_y_down'] + j*(r/2) and dense_square['bnd_y_up'] == sparse_square['bnd_y_up'] + j*(r/2):
+            if dense_square['bnd_x_down'] == sparse_square['bnd_x_down'] + i * (r / 2) and dense_square['bnd_x_up'] == \
+                    sparse_square['bnd_x_up'] + i * (r / 2):
+                if dense_square['bnd_y_down'] == sparse_square['bnd_y_down'] + j * (r / 2) and \
+                        dense_square['bnd_y_up'] == sparse_square['bnd_y_up'] + j * (r / 2):
                     return True
     return False
 
@@ -285,8 +303,8 @@ def add_sparses_to_dense_tree(g_two_tags, net, groups_on_grid, friends_dict):
         if curr_sparse['degree'] == 0:
             continue
         # Add node that represents this square
-        pos_x = (0.5) * (curr_sparse['bnd_x_down'] + curr_sparse['bnd_x_up'])
-        pos_y = (0.5) * (curr_sparse['bnd_y_down'] + curr_sparse['bnd_y_up'])
+        pos_x = 0.5 * (curr_sparse['bnd_x_down'] + curr_sparse['bnd_x_up'])
+        pos_y = 0.5 * (curr_sparse['bnd_y_down'] + curr_sparse['bnd_y_up'])
         g_two_tags.add_node(counter, pos=(pos_x, pos_y))
         curr_sparse['index_graph'] = counter
         list_of_friends = friends_dict[k]
@@ -294,14 +312,15 @@ def add_sparses_to_dense_tree(g_two_tags, net, groups_on_grid, friends_dict):
               curr_sparse['degree'])
         # Add edge that represents connection between the current sparse and one of its dense friend
         for dense_sq in list_of_friends:
-            if are_squares_connected(net, curr_sparse, dense_sq)==True:
+            if are_squares_connected(net, curr_sparse, dense_sq):
                 g_two_tags.add_edge(curr_sparse['index_graph'], dense_sq['index_graph'],
-                                    weight=curr_sparse['degree']+dense_sq['degree'])
+                                    weight=curr_sparse['degree'] + dense_sq['degree'])
                 print("Weight of (", curr_sparse['index_graph'], ",", dense_sq['index_graph'], ") is :",
-                     curr_sparse['degree'] + dense_sq['degree'])
+                      curr_sparse['degree'] + dense_sq['degree'])
                 break
         counter += 1
     return g_two_tags
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Get g_two_tags and add in time and out time for each square
@@ -313,12 +332,14 @@ def add_in_out_times(g_two_tags):
         all_in_out_times.append([])
     return add_times_dfs(g_two_tags, (list(g_two_tags.nodes))[0], all_in_out_times)
 
+
 # -----------------------------------------------------------------------------------------------------------
 # The Run over g'' by dfs and add in out time
 def add_times_dfs(g_two_tags, start, all_in_out_times):
     visited = set()
     counter, all_in_out_times = add_times_dfs_utility(g_two_tags, start, visited, all_in_out_times, 0)
     return counter, all_in_out_times
+
 
 def add_times_dfs_utility(g_two_tags, start, visited, all_in_out_times, counter):
     visited.add(start)
@@ -347,101 +368,95 @@ def travel_squares_by_times_and_build_cycle(net, g_two_tags, groups_on_grid, cou
         if i == 0:
             temp_sq_num_of_first = curr_sq_i['index_graph']
             path.append(curr_sq_i['arr_points'][i].serial_number)
-            curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'], np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][i]))
-            print("test")
             print("path:", path)
-            print("What is in path:", curr_sq_i['arr_points'][i].serial_number)
+            curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'],
+                                                np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][i]))
         # If there is not a cycle
-        if i+1 == counter and index_point_i != temp_sq_num_of_first:
-            print("test1")
+        if i + 1 == counter and index_point_i != temp_sq_num_of_first:
             print("Algorithm failed to find hamilton cycle :(")
             return
         if i + 1 == counter and index_point_i == temp_sq_num_of_first:
-            print("test2")
             for j in range(len(curr_sq_i['arr_points'])):
-                path.append(curr_sq_i['arr_points'][j].serial_number)
-                curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'], np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][j]))
+                path.append(curr_sq_i['arr_points'][0].serial_number)
                 print("path:", path)
-                print("What is in path:", curr_sq_i['arr_points'][j].serial_number)
+                curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'],
+                                                    np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][0]))
         index_i_plus_one, curr_sq_i_plus_one = square_of_counter(groups_on_grid, i + 1, all_in_out_times)
 
         # If curr_sq_i is sparse
-        if curr_sq_i['is_den'] == False:
+        if not curr_sq_i['is_den']:
             # Add to cycle all points in this square
             for j in range(len(curr_sq_i['arr_points'])):
-                print("test3")
-                path.append(curr_sq_i['arr_points'][j].serial_number)
-                curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'], np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][j]))
+                path.append(curr_sq_i['arr_points'][0].serial_number)
                 print("path:", path)
-                print("What is in path:", curr_sq_i['arr_points'][j].serial_number)
-            curr_sq_i_plus_one, next_point, flag = get_first_point_connected(net, path[len(path)-1], curr_sq_i_plus_one)
+                curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'],
+                                                    np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][0]))
+            curr_sq_i_plus_one, next_point, flag = get_first_point_connected(net, path[len(path) - 1],
+                                                                             curr_sq_i_plus_one)
             if flag == 1:
-                print("test4")
                 print("Algorithm failed to find hamilton cycle :(")
                 return path
             path.append(next_point.serial_number)
-            curr_sq_i_plus_one['arr_points'] = np.delete(curr_sq_i_plus_one['arr_points'], np.where(curr_sq_i_plus_one['arr_points'] == next_point))
             print("path:", path)
-            print("What is in path:", next_point.serial_number)
-
-        #Exchange j with 0
+            curr_sq_i_plus_one['arr_points'] = np.delete(curr_sq_i_plus_one['arr_points'],
+                                                         np.where(curr_sq_i_plus_one['arr_points'] == next_point))
 
         # If curr_sq_i is dense and this is the last time we visit this square
         if curr_sq_i['is_den'] == True and len(all_in_out_times[index_point_i]) == 1:
             # Add to cycle all points in this square
             for j in range(len(curr_sq_i['arr_points'])):
-                print("test5")
-                path.append(curr_sq_i['arr_points'][j].serial_number)
-                curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'], np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][j]))
+                path.append(curr_sq_i['arr_points'][0].serial_number)
                 print("path:", path)
-                print("What is in path:", curr_sq_i['arr_points'][j].serial_number)
-            curr_sq_i_plus_one, next_point, flag = get_first_point_connected(net, path[len(path)-1], curr_sq_i_plus_one)
+                curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'],
+                                                    np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][0]))
+            curr_sq_i_plus_one, next_point, flag = get_first_point_connected(net, path[len(path) - 1],
+                                                                             curr_sq_i_plus_one)
             if flag == 1:
-                print("test6")
                 print("Algorithm failed to find hamilton cycle :(")
                 return path
             path.append(next_point.serial_number)
-            curr_sq_i_plus_one['arr_points'] = np.delete(curr_sq_i_plus_one['arr_points'], np.where(curr_sq_i_plus_one['arr_points'] == next_point))
             print("path:", path)
-            print("What is in path:", next_point.serial_number)
+            curr_sq_i_plus_one['arr_points'] = np.delete(curr_sq_i_plus_one['arr_points'],
+                                                         np.where(curr_sq_i_plus_one['arr_points'] == next_point))
 
         # If curr_sq_i is dense and this is not the last time we visit this square
         if curr_sq_i['is_den'] == True and len(all_in_out_times[index_point_i]) > 1:
-            curr_sq_i_plus_one, next_point, flag = get_first_point_connected(net, path[len(path) - 1], curr_sq_i_plus_one)
+            curr_sq_i_plus_one, next_point, flag = get_first_point_connected(net, path[len(path) - 1],
+                                                                             curr_sq_i_plus_one)
             if flag == 1:
-                print("test7")
                 # If there is not edge to the next square
                 while flag == 1:
                     if len(curr_sq_i['arr_points']) == 0:
                         print("Algorithm failed to find hamilton cycle :(")
                         return path
                     path.append(curr_sq_i['arr_points'][0].serial_number)
-                    curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'], np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][0]))
                     print("path:", path)
-                    print("What is in path:", curr_sq_i['arr_points'][0].serial_number)
+                    curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'],
+                                                        np.where(curr_sq_i['arr_points'] == curr_sq_i['arr_points'][0]))
                     curr_sq_i_plus_one, next_point, flag = get_first_point_connected(net, path[len(path) - 1],
-                                                                               curr_sq_i_plus_one)
+                                                                                     curr_sq_i_plus_one)
                     # check if it the zero index give different point every iteration
             else:
                 # If there is edge to the next square
-                print("test8")
                 path.append(next_point.serial_number)
-                curr_sq_i_plus_one['arr_points'] = np.delete(curr_sq_i_plus_one['arr_points'], np.where(curr_sq_i_plus_one['arr_points'] == next_point))
                 print("path:", path)
-                print("What is in path:", next_point.serial_number)
+                curr_sq_i_plus_one['arr_points'] = np.delete(curr_sq_i_plus_one['arr_points'],
+                                                             np.where(curr_sq_i_plus_one['arr_points'] == next_point))
 
     return path
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Get network, point and square, return first point in this square that is connected to the given point and the update square
 
 def get_first_point_connected(net, curr_point_serial_number, next_sq):
     for next_point in next_sq['arr_points']:
-        if net.is_at_edge_by_points(net.edges, curr_point_serial_number, next_point.serial_number) == True:
+        if net.is_at_edge_by_points(net.edges, curr_point_serial_number, next_point.serial_number):
             '''# Delete from arr_point so we wont pass again in this point
             np.delete(next_sq['arr_points'], np.where(next_sq['arr_points'] == next_point))'''
             return next_sq, next_point, 0
-    return next_sq, next_point, 1
+    return next_sq, np.nan, 1
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Return the matching point number of the point in g'' that have this counter in time-list
@@ -459,6 +474,20 @@ def square_of_counter(groups_on_grid, counter, all_in_out_times):
             return point_number, sq
     return np.nan, np.nan
 
+
+# -----------------------------------------------------------------------------------------------------------
+
+def rec_dfs(net, parent, child):
+    if len(list(net.neighbors(child))) == 1:
+        print(child, ","),
+    else:
+        print(parent)
+        for v in net.neighbors(child):
+            if parent != v:
+                rec_dfs(net, child, v)
+                print(child)
+
+
 # -----------------------------------------------------------------------------------------------------------
 # Print functions
 
@@ -467,11 +496,14 @@ def print_squares_arr(squares_arr):
         print("square number : i =", i)
         print_point_arr(sq)
 
+
 def print_list_of_dict(list_of_dict):
     for i in range(len(list_of_dict)):
-        print("i =", list_of_dict[i]['i'], ",boundaries of x:", list_of_dict[i]['bnd_x_down'], ",", list_of_dict[i]['bnd_x_up'], "boundaries of y:", list_of_dict[i]['bnd_y_down'],
+        print("i =", list_of_dict[i]['i'], ",boundaries of x:", list_of_dict[i]['bnd_x_down'], ",",
+              list_of_dict[i]['bnd_x_up'], "boundaries of y:", list_of_dict[i]['bnd_y_down'],
               ",", list_of_dict[i]['bnd_y_up'])
         print_point_arr(list_of_dict[i]['arr_points'])
+
 
 def print_point_arr(point_arr):
     for i in range(0, len(point_arr)):
@@ -483,10 +515,10 @@ def print_point_arr(point_arr):
 
 def main():
     r = 0.5
-    n = 50
-    net = ge_net.Network(r)
+    n = 100
+    net = Ge_net.Network(r)
     for i in range(0, n):
-        p = pnt.Point(i)
+        p = Pnt.Point(i)
         net.add_vertex(p)
     net.make_edges()
     net.draw_network()
@@ -500,7 +532,7 @@ def main():
     threshold = calculate_threshold(n, r)
     print("========================================================================================")
     print("threshold:", threshold)
-    #dense_group, sparse_group = divide_dense_from_sparse(groups_on_grid, n, r)
+    # dense_group, sparse_group = divide_dense_from_sparse(groups_on_grid, n, r)
     dense_group, sparse_group = divide_dense_from_sparse(groups_on_grid)
     print("========================================================================================")
     print("Dense group:")
@@ -528,11 +560,12 @@ def main():
     # plt.savefig("g_tag_spanning_tree_drawing.png")
     # plt.show()
     for ele in list(g_tag_spanning_tree.edges(data='weight')):
-        print("Weight of (", ele[0], ",", ele[1], ") is :",ele[2])
+        print("Weight of (", ele[0], ",", ele[1], ") is :", ele[2])
     pos_g_tag_spanning_tree = nx.get_node_attributes(g_tag_spanning_tree, 'pos')
     nx.draw(g_tag_spanning_tree, pos_g_tag_spanning_tree, with_labels=True)
     labels_g_tag_spanning_tree = nx.get_edge_attributes(g_tag_spanning_tree, 'weight')
-    nx.draw_networkx_edge_labels(g_tag_spanning_tree, pos_g_tag_spanning_tree, label_pos=0.3, edge_labels=labels_g_tag_spanning_tree)
+    nx.draw_networkx_edge_labels(g_tag_spanning_tree, pos_g_tag_spanning_tree, label_pos=0.3,
+                                 edge_labels=labels_g_tag_spanning_tree)
     plt.savefig("g_tag_spanning_tree_drawing.png")
     plt.show()
     print("========================================================================================")
@@ -556,7 +589,30 @@ def main():
     print("========================================================================================")
     print("Traveling by times and build cycle:")
     path = travel_squares_by_times_and_build_cycle(net, g_two_tags, groups_on_grid, counter, all_in_out_times)
-    print("path :", path)
+    print("Len of path :", len(path))
+    # print("path :", path)
+    if len(path) == len(net.nodes):
+        print("Algorithm found a cycle :)")
+
+    '''
+    arr = np.array([1, 2, 3])
+    arr2 = np.delete(arr, 0)
+    print(arr2)
+    n = 20
+    r = 0.4
+    g = geometricModelGeneration.gen_graph(n, r)
+    print(g.nodes)
+    # print(g.nodes[0])
+    # print(g.neighbors(g.nodes[0]))
+    # print(g.neighbors(0))
+    # print(len(list(g.predecessors(0))), len(list(g.successors(0))))
+    print([n for n in g.neighbors(0)])
+    print(type(g.neighbors(0)))
+    print(list(g.neighbors(0))[0])
+    # print(list(g.neighbors(0).keys())[0])
+    rec_dfs(g, 0, list(g.neighbors(0))[0])
+    '''
+
 
 if __name__ == '__main__':
     main()
