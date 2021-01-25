@@ -1,8 +1,12 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+
+
 # Posa algorithm
 def posa(g):
     # Step 1-------------------------------------------------------
     print("Start of step 1:")
-    n = len(g.nodes)
+    # n = len(g.nodes)
     rail_v = []
     rail_e = []
     # We are starting from the first node - insert it to the rail and call to utility function
@@ -26,6 +30,7 @@ def posa_loop(g, x, rail_v, rail_e):
     # Check if the path is not hamiltonian
     if len(rail_v) < len(g.nodes):
         if len(rail_v) < 3:
+            draw_before_exit(g, rail_e)
             exit('algorithm failed to find a path!')  # algorithm failed
         # If the algorithm didn't fail - call utility function that make it hamiltonian
         rail_v, rail_e = rot_ext(g, rail_v, rail_e)
@@ -69,11 +74,12 @@ def make_cycle(g, rail_v, rail_e):
             if ((is_at(g.edges, (xi, xn)) == 1) or (is_at(g.edges, (xn, xi)) == 1)) and (
                     (is_at(rail_v, (xn, xi)) == 0) or (is_at(rail_v, (xi, xn)) == 0)):
                 if is_at(rail_e, (xi, xi_plus_one)) == 1:
-                    rail_v, rail_e = swap_cycle(x0, xi, xi_plus_one, xn, rail_v, rail_e)
+                    rail_v, rail_e = swap_cycle(x0, xi, xi_plus_one, xn, rail_v)
                     flag = 1  # we back from swap
                     break
         i += 1
     if flag == 0:
+        draw_before_exit(g, rail_e)
         exit('algorithm failed to find a cycle!')  # algorithm failed
     return rail_v, rail_e
 
@@ -83,7 +89,7 @@ def make_cycle(g, rail_v, rail_e):
 # This function add the edges (xi+1,x1), (xi,xn) and delete the edge (xi, xi+1)
 
 
-def swap_cycle(x0, xi, xi_plus_one, xn, rail_v, rail_e):
+def swap_cycle(x0, xi, xi_plus_one, xn, rail_v):
     temp_v = []
     temp_e = []
     index = 0
@@ -123,6 +129,7 @@ def rot_ext(g, rail_v, rail_e):
 
     # Do the extension rotation
     if len(adj_x) <= 1:
+        draw_before_exit(g, rail_e)
         exit('algorithm failed to find a path!')  # algorithm failed
     flag = 0  # tell us if we did swap
     for xi in adj_x:
@@ -142,11 +149,12 @@ def rot_ext(g, rail_v, rail_e):
             if is_at(rail_v, xk) == 1:
                 continue
             # Call utility function that to the swap - add the edge (xi+1, xk), (xi,xt) and delete the edge (xi+1, xk)
-            rail_v, rail_e = swap_rail(xi, xi_plus_one, xk, xt, rail_v, rail_e)
+            rail_v, rail_e = swap_rail(xi, xi_plus_one, xk, xt, rail_v)
             flag = 1  # we back from swap
             break
         break
     if flag == 0:
+        draw_before_exit(g, rail_e)
         exit('algorithm failed to find a path!')  # algorithm failed
     return rail_v, rail_e
 
@@ -154,7 +162,7 @@ def rot_ext(g, rail_v, rail_e):
 # --------------------------------------------------------------------------------
 # Utility function: do the swap of the rotation extension
 
-def swap_rail(xi, xi_plus_one, xk, xt, rail_v, rail_e):
+def swap_rail(xi, xi_plus_one, xk, xt, rail_v):
     temp_v = []
     temp_e = []
     index = 0
@@ -207,3 +215,16 @@ def is_at(arr, ele):
         if a == ele:
             return 1
     return 0
+
+
+# Draw the path before it exit when the algorithm failed
+
+def draw_before_exit(g, rail_e):
+    pos = nx.spring_layout(g)
+    # nx.draw(g, with_labels=True)
+    nx.draw_networkx_nodes(g, pos, cmap=plt.get_cmap('jet'), node_size=500)
+    nx.draw_networkx_labels(g, pos)
+    nx.draw_networkx_edges(g, pos, edgelist=g.edges, edge_color='k', arrows=True)
+    nx.draw_networkx_edges(g, pos, edgelist=rail_e, edge_color='r', arrows=True)
+    plt.savefig("posa_path_drawing.png")
+    plt.show()
