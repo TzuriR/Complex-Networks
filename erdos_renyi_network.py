@@ -1,9 +1,11 @@
 # import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-import Point as pnt
-import Edge as edg
-import random as rd
+import point as Pnt
+import edge as Edg
+
+
+# import random as rd
 
 
 class Network:
@@ -20,16 +22,16 @@ class Network:
     # def __init__(self, model: str):
     #    self.model = model
 
-    def random_generator(self, n: int, pr: int):
+    '''def random_generator(self, n: int, pr: int):
         if self.model == "ErdosRenyi":
             self.g = nx.generators.random_graphs.erdos_renyi_graph(n, pr)
         elif self.model == "Geometric":
             dim = 2
             p = 2
             pos = {i: (rd.uniform(0, 1), rd.uniform(0, 1)) for i in range(n)}  # problem!!
-            self.g = nx.random_geometric_graph(n=n, radius=pr, dim=dim, pos=pos, p=p, seed=None)
+            self.g = nx.random_geometric_graph(n=n, radius=pr, dim=dim, pos=pos, p=p, seed=None)'''
 
-    def add_vertex(self, v: pnt.Point) -> int:  # returns number of the vertex assigned to the network
+    def add_vertex(self, v: Pnt.Point) -> int:  # returns number of the vertex assigned to the network
         if v in self.nodes:
             print("Node is already in")
             return -1
@@ -37,19 +39,19 @@ class Network:
         self.num_of_nodes += 1
         return self.num_of_nodes
 
-    def add_edge_by_vtx(self, vtx1: pnt.Point,
-                        vtx2: pnt.Point) -> int:  # returns number of the edge assigned to the network
+    def add_edge_by_vtx(self, vtx1: Pnt.Point,
+                        vtx2: Pnt.Point) -> int:  # returns number of the edge assigned to the network
         if vtx1 not in self.nodes or vtx2 not in self.nodes:
             print("Need to add these nodes first")
             return -1
-        temp_edge = edg.Edge(vtx1, vtx2, self.num_of_edges)
+        temp_edge = Edg.Edge(vtx1, vtx2, self.num_of_edges)
         self.edges.append(temp_edge)  # ??
         self.num_of_edges += 1
         # x0 = np.ones((m, 1))
         # x_normal = np.hstack((x0, x_normal))
         return self.num_of_edges
 
-    def add_edge_by_edg(self, edge: edg.Edge) -> int:  # returns number of the edge assigned to the network
+    def add_edge_by_edg(self, edge: Edg.Edge) -> int:  # returns number of the edge assigned to the network
         self.edges.append(edge)
         self.num_of_edges += 1
         # x0 = np.ones((m, 1))
@@ -79,12 +81,21 @@ class Network:
                 return True
         return False
 
+    # Utility function: get indexes of points, return 1 if there is edge between them at the array and 0 if not
+    def find_edge_between_vertices(self, ver1: Pnt.Point, ver2: Pnt.Point):
+        for e in self.edges:
+            if e.vtx_1.serial_number == ver1.serial_number and e.vtx_2.serial_number == ver2.serial_number:
+                return e
+            if e.vtx_1.serial_number == ver2.serial_number and e.vtx_2.serial_number == ver1.serial_number:
+                return e
+        return None
+
     # Build adjacency matrix and return it
     def adjacency_matrix(self):
         adj_mat = [[0 for x in range(self.num_of_nodes)] for y in range(self.num_of_nodes)]
         for i in range(0, self.num_of_nodes):
             for j in range(0, self.num_of_nodes):
-                if self.is_at_edge_by_points(self.edges, i, j) == True:
+                if self.is_at_edge_by_points(self.edges, i, j):
                     adj_mat[i][j] = 1
                     adj_mat[j][i] = 1
         return adj_mat
@@ -95,20 +106,20 @@ class Network:
             print(mat[i])
 
     def print_point_arr(self, point_arr):
-        print("[", end ="")
+        print("[", end="")
         for i in range(0, len(point_arr)):
-            if i != len(point_arr)-1:
-                print(point_arr[i].serial_number, end =", ")
+            if i != len(point_arr) - 1:
+                print(point_arr[i].serial_number, end=", ")
             else:
-                print(point_arr[i].serial_number, end ="")
+                print(point_arr[i].serial_number, end="")
         print("]")
 
     def print_edge_arr(self, edge_arr):
-        print("[", end ="")
+        print("[", end="")
         for i in range(0, len(edge_arr)):
             print("(", end="")
             print(edge_arr[i].vtx_1.serial_number, ",", edge_arr[i].vtx_2.serial_number, end="")
-            if i != len(edge_arr)-1:
+            if i != len(edge_arr) - 1:
                 print(")", end=", ")
             else:
                 print(")", end="")
@@ -125,15 +136,15 @@ class Network:
         print("Number of edges:", self.num_of_edges)
 
     def draw_network(self):
-        '''if self.model is not "":
+        """if self.model is not "":
             nx.draw(self.g, with_labels=True)
             plt.savefig("simple_path.png")
-            plt.show()'''
+            plt.show()"""
         g = nx.Graph()
         for p in self.nodes:
             g.add_node(p.serial_number)
         for e in self.edges:
             g.add_edge(e.vtx_1.serial_number, e.vtx_2.serial_number)
         nx.draw(g, with_labels=True)
-        plt.savefig("simple_path.png")
+        plt.savefig("erdos_renyi_net_drawing.png")
         plt.show()
