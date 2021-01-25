@@ -1,6 +1,6 @@
-import posaAlgorithm
+import posa_algorithm
 import networkx as nx
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 # Case that Posa regular failed and Posa improve succeeds
 g = nx.Graph()
@@ -24,4 +24,4 @@ g.add_edge(5, 9)
 g.add_edge(5, 10)
 g.add_edge(6, 10)
 
-rail_v, rail_e = posaAlgorithm.posa(g)
+rail_v, rail_e = posa_algorithm.posa(g)
