@@ -1,15 +1,14 @@
-import Point as pnt
-import Edge as edg
+"""import point as Pnt
+import edge as Edg
 import random as rd
 import networkx as nx
 import matplotlib.pyplot as plt
-import posaImprovementForGeometricModel
-import Point as pnt
-import Edge as edg
-import erdosRenyiNetwork as er_net
-import geometricNetwork as ge_net
+import posa_improvement_for_geometricModel
+import erdos_renyi_network as er_net"""
+import point as Pnt
+import geometric_network as Ge_net
 
-#Run random graph :
+# Run random graph :
 '''net_example = er_net.Network()
 p0 = pnt.Point(0)
 net_example.add_vertex(p0)
@@ -38,12 +37,12 @@ net_example.add_edge_by_edg(edge5)
 net_example.print_network()
 net_example.draw_network()'''
 
-#Run geometric graph :
+# Run geometric graph :
 r = 0.4
-net_example = ge_net.Network(r)
+net_example = Ge_net.Network(r)
 n = 12
 for i in range(0, n):
-    p = pnt.Point(i)
+    p = Pnt.Point(i)
     net_example.add_vertex(p)
 net_example.make_edges()
 net_example.print_network()
