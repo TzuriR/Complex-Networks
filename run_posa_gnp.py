@@ -1,13 +1,13 @@
-import posaAlgorithm
-import erdosRenyiModelGeneration
+import posa_algorithm
+import erdos_renyi_model_generation
 import networkx as nx
 import matplotlib.pyplot as plt
 
 # Call function
 n = 40
 p = 0.5
-g = erdosRenyiModelGeneration.gen_graph(n, p)
-rail_v_gnp, rail_e_gnp = posaAlgorithm.posa(g)
+g = erdos_renyi_model_generation.gen_graph(n, p)
+rail_v_gnp, rail_e_gnp = posa_algorithm.posa(g)
 
 pos = nx.spring_layout(g)
 nx.draw_networkx_nodes(g, pos, cmap=plt.get_cmap('jet'), node_size=500)
