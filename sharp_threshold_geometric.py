@@ -447,6 +447,42 @@ def travel_squares_by_times_and_build_cycle(net, g_two_tags, groups_on_grid, cou
 
 
 # -----------------------------------------------------------------------------------------------------------
+# Get network, point and square, return point in this square that is connected to the given point and the update square
+# In case that this is last time we visit in this square
+
+def get_exit_point_last_visit(net, curr_point_obj, curr_sq, next_sq):
+    # if the current point is the exit point
+    if len(curr_sq['arr_points']) == 0:
+        for next_point in next_sq['arr_points']:
+            if net.is_at_edge_by_points(net.edges, curr_point_obj.serial_number, next_point.serial_number):
+                return curr_point_obj, next_point
+        return None, None
+    # Search for point connected to next square
+    for temp_point_i in curr_sq['arr_points']:
+        for next_point_j in next_sq['arr_points']:
+            if net.is_at_edge_by_points(net.edges, temp_point_i.serial_number, next_point_j.serial_number):
+                return temp_point_i, next_point_j
+    return None, None
+
+
+# -----------------------------------------------------------------------------------------------------------
+# Get network, point and square, return point in this square that is connected to the given point and the update square
+# In case that this is not last time we visit in this square
+
+def get_exit_point_not_last_visit(net, curr_point_obj, curr_sq, next_sq):
+    # if the current point is the exit point
+    for next_point in next_sq['arr_points']:
+        if net.is_at_edge_by_points(net.edges, curr_point_obj.serial_number, next_point.serial_number):
+            return curr_point_obj, next_point
+    # Search for point connected to next square
+    for temp_point_i in curr_sq['arr_points']:
+        for next_point_j in next_sq['arr_points']:
+            if net.is_at_edge_by_points(net.edges, temp_point_i.serial_number, next_point_j.serial_number):
+                return temp_point_i, next_point_j
+    return None, None
+
+
+# -----------------------------------------------------------------------------------------------------------
 # Get network, point and square, return first point in this square that is connected to the given point and the update square
 
 def get_first_point_connected(net, curr_point_serial_number, next_sq):
