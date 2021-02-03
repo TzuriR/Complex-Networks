@@ -424,6 +424,8 @@ def travel_squares_by_times_and_build_cycle(net, g_two_tags, groups_on_grid, cou
                 path.append(temp_exit_point.serial_number)
                 path_points_obj.append(temp_exit_point)
                 # print("path:", path)
+                curr_sq_i['arr_points'] = np.delete(curr_sq_i['arr_points'],
+                                                    np.where(curr_sq_i['arr_points'] == temp_exit_point))
             # curr_sq_i_plus_one,next_point, flag=get_first_point_connected(net,path[len(path)-1],curr_sq_i_plus_one)
 
             path.append(temp_next_point.serial_number)
