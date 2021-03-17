@@ -76,13 +76,17 @@ def is_connected_to_all_clique_nodes(g, clique_list, temp_node_num):
     return True
 
 
+def check_if_clique(net, clique_list):
+    for ele_1 in clique_list:
+        for ele_2 in clique_list:
+            if ele_1 != ele_2:
+                if not net.is_at_edge_by_points(net.edges, ele_1, ele_2):
+                    print("There is no clique")
+
+
 # ---------------------------------------------------------------------------------------------------
 
-def main():
-    n = 10
-    m = 2
-    # generate model
-    g = generate_model(n, m)
+def barabasi_clique(g):
     # get node with highest degree
     max_node, max_degree = find_node_with_high_degree(g)
     print("g.degree :", g.degree)
@@ -97,11 +101,21 @@ def main():
     nx.draw_networkx_nodes(g, pos=pos, nodelist=clique_list, node_color='r')
     plt.savefig("clique_drawing.png")
     plt.show()
+    # check_if_clique(g, clique_list)
     # Checking
-    # list_of_cliques = list(nx.enumerate_all_cliques(g))
-    # max_len = len(list_of_cliques[len(list_of_cliques)-1])
-    # print("length :", max_len)
+    list_of_cliques = list(nx.enumerate_all_cliques(g))
+    max_len = len(list_of_cliques[len(list_of_cliques) - 1])
+    print("check length :", max_len)
 
+
+# ---------------------------------------------------------------------------------------------------
+
+def main():
+    n = 100
+    m = 3
+    # generate model
+    g = generate_model(n, m)
+    barabasi_clique(g)
 
 if __name__ == '__main__':
     main()
