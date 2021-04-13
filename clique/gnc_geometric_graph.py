@@ -89,3 +89,98 @@ class Network:
             if e.serial_number == index:
                 return True
         return False
+
+    # Utility function: get indexes of points, return 1 if there is edge between them at the array and 0 if not
+    def is_at_edge_by_points(self, edges_arr, index1: int, index2: int) -> bool:
+        for e in edges_arr:
+            if e.vtx_1.serial_number == index1 and e.vtx_2.serial_number == index2:
+                return True
+            if e.vtx_1.serial_number == index2 and e.vtx_2.serial_number == index1:
+                return True
+        return False
+
+    # Build adjacency matrix and return it
+    def adjacency_matrix(self):
+        adj_mat = [[0 for x in range(self.num_of_nodes)] for y in range(self.num_of_nodes)]
+        for i in range(0, self.num_of_nodes):
+            for j in range(0, self.num_of_nodes):
+                if self.is_at_edge_by_points(self.edges, i, j):
+                    adj_mat[i][j] = 1
+                    adj_mat[j][i] = 1
+        return adj_mat
+
+    # Utility functions: printing
+    def print_mat(self, mat):
+        for i in range(0, len(mat)):
+            print(mat[i])
+
+    def print_point_arr(self, point_arr):
+        print("[", end="")
+        for i in range(0, len(point_arr)):
+            if i != len(point_arr) - 1:
+                print(point_arr[i].serial_number, end=", ")
+            else:
+                print(point_arr[i].serial_number, end="")
+        print("]")
+
+    def print_edge_arr(self, edge_arr):
+        print("[", end="")
+        for i in range(0, len(edge_arr)):
+            print("(", end="")
+            print(edge_arr[i].vtx_1.serial_number, ",", edge_arr[i].vtx_2.serial_number, end="")
+            if i != len(edge_arr) - 1:
+                print(")", end=", ")
+            else:
+                print(")", end="")
+        print("]")
+
+    def print_network(self):
+        print("g.nodes:")
+        self.print_point_arr(self.nodes)
+        print("g.edges:")
+        self.print_edge_arr(self.edges)
+        # print("Adjacency matrix:")
+        # self.print_mat(self.adjacency_matrix())
+        print("Number of nodes:", self.num_of_nodes)
+        print("Number of edges:", self.num_of_edges)
+
+    def draw_network(self, title, nodes_list=None):
+        g = nx.Graph()
+        for p in self.nodes:
+            g.add_node(p.serial_number)
+        for e in self.edges:
+            g.add_edge(e.vtx_1.serial_number, e.vtx_2.serial_number)
+        pos_dict = {}
+        for p in self.nodes:
+            pos_dict[p.serial_number] = (p.x_value, p.y_value)
+        fig, ax = plt.subplots()
+        nx.draw_networkx(g, ax=ax, pos=pos_dict, with_labels=True)
+        if nodes_list is not None:
+            '''red_pos_dict = {}
+            for temp_node in nodes_list:
+                red_pos_dict[temp_node.serial_number] = (temp_node.x_value, temp_node.y_value)
+            nx.draw_networkx_nodes(g, pos=red_pos_dict, nodelist=nodes_list, node_color='r')'''
+            drawing_nodes = []
+            red_pos_dict = {}
+            for temp_node in nodes_list:
+                # drawing_nodes.append(g.nodes[temp_node.serial_number])
+                drawing_nodes.append(temp_node.serial_number)
+                red_pos_dict[temp_node.serial_number] = (temp_node.x_value, temp_node.y_value)
+            nx.draw_networkx_nodes(g, pos=red_pos_dict, nodelist=drawing_nodes, node_color='r')
+        plt.savefig("{}_drawing.png".format(title))
+        plt.show()
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        list_of_cliques = list(nx.enumerate_all_cliques(g))
+        max_len = len(list_of_cliques[len(list_of_cliques) - 1])
+        # print("list_of_cliques :")
+        # print(list_of_cliques)
+        print("len of checking :", max_len)
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+
+
+    def get_point_by_location_values(self, x_val, y_val):
+        for temp_node in self.nodes:
+            if temp_node.x_value == x_val and temp_node.y_value == y_val:
+                return temp_node
+        print("There is no node with those values")
+        return None
