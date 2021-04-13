@@ -14,3 +14,17 @@ def generate_model(n, c):
     net.print_network()
     net.draw_network("main_network")
     return net
+
+
+# -----------------------------------------------------------------------------------------------------
+
+def main():
+    n = 50
+    c = 0.01
+    net = generate_model(n, c)
+    max_clique_group = maximal_clique_algorithm.deterministic_maximal_clique_algorithm(net)
+    # maximal_clique_algorithm.check_if_clique(net, max_clique_group)
+
+
+if __name__ == '__main__':
+    main()
