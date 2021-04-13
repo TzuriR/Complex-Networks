@@ -1,6 +1,6 @@
 import point as pnt
 import geometric_network as ge_net
-
+from sympy import symbols, Eq, solve
 
 # -----------------------------------------------------------------------------------------------------
 # Definition of class represents line
@@ -219,11 +219,10 @@ def deterministic_maximal_clique_algorithm(net):
     max_index = 0
     for node_1 in net.nodes:
         for node_2 in net.nodes:
-            if index == 9:
-                print("***************************************************************************")
-                print("index :", index)
-                node_1.print_point()
-                node_2.print_point()
+            print("***************************************************************************")
+            print("index :", index)
+            node_1.print_point()
+            node_2.print_point()
             if node_1 == node_2:
                 continue
             if not net.is_at_edge_by_points(net.edges, node_1.serial_number, node_2.serial_number):
@@ -245,6 +244,9 @@ def deterministic_maximal_clique_algorithm(net):
                 max_clique_group = clique_list
                 max_index = index
             index += 1
+    print("**************************************************************************")
+    print("maximal clique :")
+    net.print_point_arr(max_clique_group)
     print("len of maximal clique :", len(max_clique_group), "max index :", max_index)
     net.draw_network("clique_network", max_clique_group)
     return max_clique_group
@@ -256,6 +258,7 @@ def check_if_clique(net, clique_list):
             if ele_1 != ele_2:
                 if not net.is_at_edge_by_points(net.edges, ele_1, ele_2):
                     print("There is no clique")
+
 
 
 # -----------------------------------------------------------------------------------------------------
