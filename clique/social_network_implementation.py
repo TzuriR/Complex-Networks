@@ -5,7 +5,7 @@ import networkx as nx
 import erdos_renyi_network as er_net
 import point as pnt
 import numpy as np
-# import posa_algorithm_real_world_nx
+import posa_algorithm_real_world_nx
 import posa_improvement_real_world_nx
 
 def generate_net_from_adj_mat_file_class(file_name, file_type):
@@ -117,9 +117,18 @@ def sort_df_by_sum(df, n):
     print(df)
     return df
 
+def count_tr(net):
+    s = 0
+    for i in range(0, len(net.nodes)):
+        for j in range(0, i):
+            for k in range(0, j):
+                if net.has_edge(i, j) and net.has_edge(i, k) and net.has_edge(j, k):
+                    s += 1
+    print("s:", s)
+    return s
 
 def main():
-    n = 700
+    n = 1000
     # Run our class :
     '''# 250315 edges
     twitter_net = generate_net_from_adj_mat_file_class('Twitter_Data', 'xlsx')
@@ -129,21 +138,32 @@ def main():
     # instagram_net = generate_net_from_adj_mat_file_class('Instagram_Data', 'xlsx')
     rail_v, rail_e = posa_algorithm_real_world_class.posa(twitter_net)'''
     # Run our nx :
+    # --------------------------------------------------------------------------------------------
+    # Twitter
     # 250315 edges
-    # twitter_net = generate_net_from_adj_mat_file_nx('Twitter_Data', 'xlsx', n)
+    # s: 20916815
+    twitter_net = generate_net_from_adj_mat_file_nx('Twitter_Data', 'xlsx', n)
+    # --------------------------------------------------------------------------------------------
+    # Facebook
     # 50153 edges
-    facebook_net = generate_net_from_adj_mat_file_nx('Facebook_Data', 'xlsx', n)
+    # s: 167964
+    # facebook_net = generate_net_from_adj_mat_file_nx('Facebook_Data', 'xlsx', n)
+    # --------------------------------------------------------------------------------------------
+    # Instagram
     # 4933 edges
+    # s: 136
     # instagram_net = generate_net_from_adj_mat_file_nx('Instagram_Data', 'xlsx', n)
+    s = count_tr(twitter_net)
     # print("is connected :", nx.is_connected(instagram_net))
     # Run posa - hamiltonian cycle
     # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     # print("Run posa :")
     # rail_v_posa, rail_e_posa = posa_algorithm_real_world_nx.posa(facebook_net)
     # Run posa improvement - hamiltonian path
-    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    print("Run posa improvement :")
-    rail_v_posa_imp, rail_e_posa_imp = posa_improvement_real_world_nx.posa(facebook_net)
+    # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    # print("Run posa improvement :")
+    # rail_v_posa_imp, rail_e_posa_imp = posa_improvement_real_world_nx.posa(facebook_net)
+
 
 if __name__ == '__main__':
     main()
