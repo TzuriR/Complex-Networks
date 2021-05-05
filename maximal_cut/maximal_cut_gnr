@@ -1,0 +1,64 @@
+import point as pnt
+import geometric_network as ge_net
+import numpy as np
+import math
+
+
+# -----------------------------------------------------------------------------------------------------
+# Definition of class represents circle
+
+class Circle:
+    r: int = 0
+    center_x: float = 0.0
+    center_y: float = 0.0
+
+    def __init__(self, rad: int, p: pnt):
+        self.r = rad
+        self.center_x = p.x_value
+        self.center_y = p.y_value
+
+    def calculate_relation_to_circle(self, vtx: pnt):
+        val = (vtx.x_value - self.center_x) ** 2 + (vtx.y_value - self.center_y) ** 2 - self.r ** 2
+        return val
+
+    def print_line(self):
+        print("(x -", self.center_x, ")² + (y -", self.center_y, ")² =", self.r ** 2)
+
+
+# -----------------------------------------------------------------------------------------------------
+
+def generate_model(n, r):
+    net = ge_net.Network(r)
+    for i in range(0, n):
+        p = pnt.Point(i)
+        net.add_vertex(p)
+    net.make_edges()
+    net.print_network()
+    net.draw_network("main_network")
+    return net
+
+
+# -----------------------------------------------------------------------------------------------------
+# Calculate nodes degree and return a sorted list with the degrees
+# In addition the function return list with nodes number where in the start of the list exist the most connected node
+
+def cal_sort_nodes_by_degree(net):
+    degree_list = []
+    # Get the adjacency matrix
+    mat = net.adjacency_matrix()
+    n = len(mat)
+    # print("mat :")
+    # net.print_mat(mat)
+    # Create list of degrees by the adjacency matrix
+    for i in range(n):
+        degree_list.append(sum(mat[i]))
+    # print("degree_list :", degree_list)
+    # Sort the nodes by degree
+    indexes_list = list(np.arange(n))
+    zipped_lists = zip(degree_list, indexes_list)
+    sorted_pairs = sorted(zipped_lists, reverse=True)
+    tuples = zip(*sorted_pairs)
+    degree_list, indexes_list = [list(t) for t in tuples]
+    print("degree_list :", degree_list)
+    print("indexes_list :", indexes_list)
+    return degree_list, indexes_list
