@@ -114,3 +114,26 @@ def divide_to_groups(net, len_of_cut, set_s_centers, set_t, degree_list, indexes
 
 
 # -----------------------------------------------------------------------------------------------------
+
+def main():
+    n = 10
+    r = 0.6
+    net = generate_model(n, r)
+    set_s_centers = []
+    set_t = []
+    degree_list, indexes_list = cal_sort_nodes_by_degree(net)
+    set_s_centers, set_t, len_of_cut = divide_to_groups(net, 0, set_s_centers, set_t, degree_list, indexes_list,
+                                                        list(np.arange(n)))
+    print("len of S :", len(set_s_centers))
+    print("len of T :", len(set_t))
+    print("sum of len of groups :", len(set_s_centers) + len(set_t))
+    print("len of cut :", len_of_cut)
+    print("len of cut / num of edges :", 2*len_of_cut/net.num_of_edges)
+    center_nodes = []
+    for center_num in set_s_centers:
+        center_nodes.append(net.nodes[center_num])
+    net.draw_network("maximal_cut", nodes_list=center_nodes)
+
+
+if __name__ == '__main__':
+    main()
