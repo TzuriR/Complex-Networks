@@ -62,3 +62,55 @@ def cal_sort_nodes_by_degree(net):
     print("degree_list :", degree_list)
     print("indexes_list :", indexes_list)
     return degree_list, indexes_list
+
+
+# -----------------------------------------------------------------------------------------------------
+# Recursion function : Update S and T - create the maximal cut
+
+def divide_to_groups(net, len_of_cut, set_s_centers, set_t, degree_list, indexes_list, nodes_number_list):
+    # k is ceiling value of lan(n)
+    k = math.ceil(math.log(len(indexes_list)))
+    if k == 0:
+        k = 1
+    k_high_deg_nodes_num = indexes_list[0:k]
+    # print("k :", k)
+    # print("k_high_deg_nodes_num :")
+    # print(k_high_deg_nodes_num)
+    for node_number_i in k_high_deg_nodes_num:
+        # Insert the center nodes into set_s_centers
+        set_s_centers.append(node_number_i)
+    for node_number_i in k_high_deg_nodes_num:
+        # print("node_number_i :", node_number_i)
+        # circle_u = Circle(d, u)
+        circle_i = Circle(net.r, net.nodes[node_number_i])
+        # Insert to set_t the nodes which are in the circle of node_number_i
+        for node_number_j in nodes_number_list:
+            # print("nodes_number_list :", nodes_number_list)
+            # print("node_number_j :", node_number_j)
+            # Calculate the relation of node_number_j to the circle of node_number_i
+            val = circle_i.calculate_relation_to_circle(net.nodes[node_number_j])
+            if val <= 0:
+                # print("val <= 0")
+                # if node_number_j is already at the cut
+                if node_number_j in set_s_centers:
+                    # print("continue")
+                    continue
+                len_of_cut += 1
+                # print("len_of_cut :", len_of_cut)
+                if not(node_number_j in set_t):
+                    # print("append and remove")
+                    set_t.append(node_number_j)
+                    degree_list.remove(degree_list[indexes_list.index(node_number_j)])
+                    indexes_list.remove(node_number_j)
+        # Update degree_list and indexes_list
+        degree_list.remove(degree_list[indexes_list.index(node_number_i)])
+        indexes_list.remove(node_number_i)
+    if len(indexes_list) > 0:
+        nodes_number_list = indexes_list
+        # Call recursion
+        set_s_centers, set_t, len_of_cut = divide_to_groups(net, len_of_cut, set_s_centers, set_t,
+                                                            degree_list, indexes_list, nodes_number_list)
+    return set_s_centers, set_t, len_of_cut
+
+
+# -----------------------------------------------------------------------------------------------------
