@@ -15,14 +15,15 @@ def gen_graph(n, r):
     # g = nx.random_geometric_graph(n=n, radius=r)
     pos = {i: (rd.uniform(0, 1), rd.uniform(0, 1)) for i in range(n)}
     g = nx.random_geometric_graph(n=n, radius=r, dim=dim, pos=pos, p=p, seed=None)
-    # The distance between a and b
-    '''i = 0
+    # FOR ZUR!!!
+    '''# The distance between a and b
+    i = 0
     for v in g.nodes:
         print("v:", v)
         x, y = g.nodes[i]['pos']
         print("x, y:", x, y)
-        i += 1'''
-    nx.draw(g, with_labels=True)
+        i += 1
+    nx.draw(g, pos=pos, with_labels=True)
     plt.savefig("simple_path.png")
-    plt.show()
+    plt.show()'''
     return g
