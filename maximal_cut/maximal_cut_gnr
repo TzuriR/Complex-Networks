@@ -115,24 +115,39 @@ def divide_to_groups(net, len_of_cut, set_s_centers, set_t, degree_list, indexes
 
 # -----------------------------------------------------------------------------------------------------
 
+def maximal_cut_gnr_random_centers(net, set_s_centers, set_t):
+    degree_list, indexes_list = cal_sort_nodes_by_degree(net)
+    set_s_centers, set_t, len_of_cut = divide_to_groups(net, 0, set_s_centers, set_t, degree_list, indexes_list,
+                                                        list(np.arange(len(net.nodes))))
+    print("len of a :", len(set_s_centers))
+    print("len of b :", len(set_t))
+    print("sum of a+b :", len(set_s_centers) + len(set_t))
+    print("len of cut :", len_of_cut)
+    # For G(n,r) : need to divide len of edges in 2
+    print("len of edges :", len(net.edges) / 2)
+    print("len of cut / num of edges :", 2 * len_of_cut / len(net.edges))
+    center_nodes = []
+    for center_num in set_s_centers:
+        center_nodes.append(net.nodes[center_num])
+    net.draw_network("maximal_cut", nodes_list=center_nodes)
+    set_s_points = []
+    set_t_points = []
+    for point_s_i in set_s_centers:
+        set_s_points.append(net.nodes[point_s_i])
+    for point_t_i in set_t:
+        set_t_points.append(net.nodes[point_t_i])
+    return set_s_points, set_t_points, len_of_cut
+
+
+# -----------------------------------------------------------------------------------------------------
+
 def main():
     n = 10
     r = 0.6
     net = generate_model(n, r)
     set_s_centers = []
     set_t = []
-    degree_list, indexes_list = cal_sort_nodes_by_degree(net)
-    set_s_centers, set_t, len_of_cut = divide_to_groups(net, 0, set_s_centers, set_t, degree_list, indexes_list,
-                                                        list(np.arange(n)))
-    print("len of S :", len(set_s_centers))
-    print("len of T :", len(set_t))
-    print("sum of len of groups :", len(set_s_centers) + len(set_t))
-    print("len of cut :", len_of_cut)
-    print("len of cut / num of edges :", 2*len_of_cut/net.num_of_edges)
-    center_nodes = []
-    for center_num in set_s_centers:
-        center_nodes.append(net.nodes[center_num])
-    net.draw_network("maximal_cut", nodes_list=center_nodes)
+    set_s_centers, set_t, len_of_cut = maximal_cut_gnr_random_centers(net, set_s_centers, set_t)
 
 
 if __name__ == '__main__':
