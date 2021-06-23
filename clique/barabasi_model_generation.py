@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
 # ---------------------------------------------------------------------------------------------------
 # Get n and m and generate barabasi model
 
@@ -71,7 +72,7 @@ def clique_high_degree(g, node, nodes_neighbors):
 
 def is_connected_to_all_clique_nodes(g, clique_list, temp_node_num):
     for node_ele_num in clique_list:
-        if g.has_edge(temp_node_num, node_ele_num) == False and g.has_edge(node_ele_num, temp_node_num) == False:
+        if not g.has_edge(temp_node_num, node_ele_num) and not g.has_edge(node_ele_num, temp_node_num):
             return False
     return True
 
@@ -81,6 +82,14 @@ def check_if_clique(net, clique_list):
         for ele_2 in clique_list:
             if ele_1 != ele_2:
                 if not net.is_at_edge_by_points(net.edges, ele_1, ele_2):
+                    print("There is no clique")
+
+
+def check_if_clique_nx(net, clique_list):
+    for ele_1 in clique_list:
+        for ele_2 in clique_list:
+            if ele_1 != ele_2:
+                if not net.has_edge(ele_1, ele_2):
                     print("There is no clique")
 
 
@@ -101,21 +110,25 @@ def barabasi_clique(g):
     nx.draw_networkx_nodes(g, pos=pos, nodelist=clique_list, node_color='r')
     plt.savefig("clique_drawing.png")
     plt.show()
-    # check_if_clique(g, clique_list)
+    check_if_clique_nx(g, clique_list)
     # Checking
     list_of_cliques = list(nx.enumerate_all_cliques(g))
     max_len = len(list_of_cliques[len(list_of_cliques) - 1])
     print("check length :", max_len)
-
+    # For final report
+    # if len(clique_list) == max_len:
+    #     return clique_list, 1
+    return clique_list
 
 # ---------------------------------------------------------------------------------------------------
 
 def main():
-    n = 100
-    m = 3
+    n = 50
+    m = 4
     # generate model
     g = generate_model(n, m)
-    barabasi_clique(g)
+    _ = barabasi_clique(g)
+
 
 if __name__ == '__main__':
     main()
