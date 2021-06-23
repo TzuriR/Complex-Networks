@@ -1,5 +1,5 @@
-import geometric_network as Ge_net
-import point as Pnt
+import geometric_network as ge_net
+import point as pnt
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -317,7 +317,8 @@ def add_sparses_to_dense_tree(g_two_tags, net, groups_on_grid, friends_dict):
                                     weight=curr_sparse['degree'] + dense_sq['degree'])
                 print("Weight of (", curr_sparse['index_graph'], ",", dense_sq['index_graph'], ") is :",
                       curr_sparse['degree'] + dense_sq['degree'])'''
-                w = abs(curr_sparse['bnd_x_up'] - dense_sq['bnd_x_up']) + abs(curr_sparse['bnd_y_up'] - dense_sq['bnd_y_up'])
+                w = abs(curr_sparse['bnd_x_up'] - dense_sq['bnd_x_up']) + abs(
+                    curr_sparse['bnd_y_up'] - dense_sq['bnd_y_up'])
                 g_two_tags.add_edge(curr_sparse['index_graph'], dense_sq['index_graph'], weight=w)
                 print("Weight of (", curr_sparse['index_graph'], ",", dense_sq['index_graph'], ") is :", w)
                 break
@@ -331,7 +332,7 @@ def add_sparses_to_dense_tree(g_two_tags, net, groups_on_grid, friends_dict):
 def add_in_out_times(g_two_tags):
     # Initialization
     all_in_out_times = []
-    for sq in g_two_tags.nodes:
+    for _ in g_two_tags.nodes:
         all_in_out_times.append([])
     return add_times_dfs(g_two_tags, (list(g_two_tags.nodes))[0], all_in_out_times)
 
@@ -402,7 +403,7 @@ def travel_squares_by_times_and_build_cycle(net, g_two_tags, groups_on_grid, cou
         # If curr_sq_i is sparse or If curr_sq_i is dense and this is the last time we visit this square
 
         # if (not curr_sq_i['is_den']) or (curr_sq_i['is_den'] is True and len(all_in_out_times[index_point_i]) == 1):
-        if (not curr_sq_i['is_den']) or (curr_sq_i['is_den'] is True and all_in_out_times[index_point_i][len(all_in_out_times[index_point_i])-1] == i):
+        if (not curr_sq_i['is_den']) or (curr_sq_i['is_den'] is True and all_in_out_times[index_point_i][len(all_in_out_times[index_point_i]) - 1] == i):
             print("last time condition")
             temp_exit_point, temp_next_point = get_exit_point_last_visit(net, path_points_obj[len(path_points_obj) - 1],
                                                                          curr_sq_i, curr_sq_i_plus_one)
@@ -441,7 +442,8 @@ def travel_squares_by_times_and_build_cycle(net, g_two_tags, groups_on_grid, cou
         if curr_sq_i['is_den'] and all_in_out_times[len(all_in_out_times) - 1] != i:
             print("not last time condition")
             temp_exit_point, temp_next_point = get_exit_point_not_last_visit(net,
-                                path_points_obj[len(path_points_obj) - 1], curr_sq_i, curr_sq_i_plus_one)
+                                                                             path_points_obj[len(path_points_obj) - 1],
+                                                                             curr_sq_i, curr_sq_i_plus_one)
             if temp_exit_point is None or temp_next_point is None:
                 print("Algorithm failed to find hamilton cycle :(")
                 return path
@@ -566,15 +568,99 @@ def print_point_arr(point_arr):
         point_arr[i].print_point()
 
 
+def run_sharp_threshold(n, r):
+    net = ge_net.Network(r)
+    for i in range(0, n):
+        p = pnt.Point(i)
+        net.add_vertex(p)
+    net.make_edges()
+    # net.draw_network()
+    print("Edges :")
+    net.print_edge_arr(net.edges)
+    groups_on_grid = divide_to_grid(net, n, r)
+    print("========================================================================================")
+    print("groups_on_grid:")
+    print_list_of_dict(groups_on_grid)
+    # Make sure num_of_squares is squared!!!!!!!!!!!!!!!!!!
+    threshold = calculate_threshold(n, r)
+    print("========================================================================================")
+    print("threshold:", threshold)
+    # dense_group, sparse_group = divide_dense_from_sparse(groups_on_grid, n, r)
+    dense_group, sparse_group = divide_dense_from_sparse(groups_on_grid)
+    print("========================================================================================")
+    print("Dense group:")
+    print_list_of_dict(dense_group)
+    print("len of dense group:", len(dense_group))
+    print("========================================================================================")
+    print("Sparse group:")
+    print_list_of_dict(sparse_group)
+    print("len of sparse group:", len(sparse_group))
+    print("========================================================================================")
+    print("g_tag:")
+    g_tag = build_g_tag(net, dense_group, threshold)
+    pos_g_tag = nx.get_node_attributes(g_tag, 'pos')
+    # nx.draw(g_tag, pos_g_tag, with_labels=True)
+    labels_g_tag = nx.get_edge_attributes(g_tag, 'weight')
+    # nx.draw_networkx_edge_labels(g_tag, pos_g_tag, label_pos=0.3, edge_labels=labels_g_tag)
+    # plt.savefig("g_tag_drawing.png")
+    # plt.show()
+    print("========================================================================================")
+    print("spanning tree of g_tag:")
+    # Build spanning tree of g_tag
+    # g_tag_spanning_tree = nx.maximum_spanning_tree(g_tag)
+    g_tag_spanning_tree = nx.minimum_spanning_tree(g_tag)
+    # nx.draw(g_tag_spanning_tree, with_labels=True)
+    # plt.savefig("g_tag_spanning_tree_drawing.png")
+    # plt.show()
+    for ele in list(g_tag_spanning_tree.edges(data='weight')):
+        print("Weight of (", ele[0], ",", ele[1], ") is :", ele[2])
+    # pos_g_tag_spanning_tree = nx.get_node_attributes(g_tag_spanning_tree, 'pos')
+    # nx.draw(g_tag_spanning_tree, pos_g_tag_spanning_tree, with_labels=True)
+    # labels_g_tag_spanning_tree = nx.get_edge_attributes(g_tag_spanning_tree, 'weight')
+    # nx.draw_networkx_edge_labels(g_tag_spanning_tree, pos_g_tag_spanning_tree, label_pos=0.3,
+    #                             edge_labels=labels_g_tag_spanning_tree)
+    # plt.savefig("g_tag_spanning_tree_drawing.png")
+    # plt.show()
+    print("========================================================================================")
+    g_two_tags = g_tag_spanning_tree.copy()
+    print("friend_dict of sparse squares in g_two_tags:")
+    friends_dict = label_sparse_point_to_dense(net, groups_on_grid, dense_group, sparse_group, r)
+    print("========================================================================================")
+    print("g_two_tags:")
+    g_two_tags = add_sparses_to_dense_tree(g_two_tags, net, groups_on_grid, friends_dict)
+    pos_g_two_tags = nx.get_node_attributes(g_two_tags, 'pos')
+    # nx.draw(g_two_tags, pos_g_two_tags, with_labels=True)
+    labels_g_two_tags = nx.get_edge_attributes(g_two_tags, 'weight')
+    # nx.draw_networkx_edge_labels(g_two_tags, pos_g_two_tags, label_pos=0.3, edge_labels=labels_g_two_tags)
+    # plt.savefig("g_two_tags_drawing.png")
+    # plt.show()
+    print("========================================================================================")
+    print("Dfs and adding in-out times:")
+    counter, all_in_out_times = add_in_out_times(g_two_tags)
+    print("\nall_in_out_times:")
+    for index in range(len(all_in_out_times)):
+        print("index =", index, ", all_in_out_times[index] :", all_in_out_times[index])
+    # print("counter:", counter)
+    print("========================================================================================")
+    print("Traveling by times and build cycle:")
+    path = travel_squares_by_times_and_build_cycle(net, g_two_tags, groups_on_grid, counter, all_in_out_times)
+    print("Len of path :", len(path))
+    print("Len of net.nodes :", len(net.nodes))
+    print("path :", path)
+    if len(path) == len(net.nodes):
+        print("Algorithm found a cycle :)")
+        return path, 1
+    return path, 0
+
 # -----------------------------------------------------------------------------------------------------------
 # main
 
 def main():
     r = 0.5
-    n = 150
-    net = Ge_net.Network(r)
+    n = 100
+    net = ge_net.Network(r)
     for i in range(0, n):
-        p = Pnt.Point(i)
+        p = pnt.Point(i)
         net.add_vertex(p)
     net.make_edges()
     net.draw_network()
