@@ -19,6 +19,7 @@ def posa(g):
 # Utility function, get graph and node, and do the 3 steps of building an hamiltonian cycle
 
 def posa_loop(g, x, rail_v, rail_e):
+    print("test")
     # call utility function that create initial path
     rail_v, rail_e = insert_to_rail(g, x, rail_v, rail_e)
     print("rail_v:", rail_v)
@@ -29,7 +30,9 @@ def posa_loop(g, x, rail_v, rail_e):
     # Check if the path is not hamiltonian
     if len(rail_v) < len(g.nodes):
         if len(rail_v) < 3:
-            exit('algorithm failed to find a path!')  # algorithm failed
+            print("len of rail :", len(rail_v))
+            raise ValueError(len(rail_v))
+            # exit('algorithm failed to find a path!')  # algorithm failed
         # If the algorithm didn't fail - call utility function that make it hamiltonian
         rail_v, rail_e = rot_ext(g, rail_v, rail_e)
     print("rail_v:", rail_v)
@@ -84,7 +87,9 @@ def make_cycle(g, rail_v, rail_e):
         rail_v, rail_e = approximation_of_edges(g, rail_v, rail_e)
         print("After approximation:")
         if len(rail_v) != len(rail_e):
-            exit('algorithm failed to find a cycle!')  # algorithm failed
+            print("len of rail :", len(rail_v))
+            raise ValueError(len(rail_v))
+            # exit('algorithm failed to find a cycle!')  # algorithm failed
     return rail_v, rail_e
 
 
@@ -192,7 +197,9 @@ def rot_ext(g, rail_v, rail_e):
             adj_x.append(e[0])
     # Do the extension rotation
     if len(adj_x) <= 1:
-        exit('algorithm failed to find a path!')  # algorithm failed
+        print("len of rail :", len(rail_v))
+        raise ValueError(len(rail_v))
+        # exit('algorithm failed to find a path!')  # algorithm failed
     flag = 0  # tell us if we did swap
     for xi in adj_x:
         if xi == rail_v[len(rail_v) - 2]:
@@ -216,7 +223,9 @@ def rot_ext(g, rail_v, rail_e):
             break
         break
     if flag == 0:
-        exit('algorithm failed to find a path!')  # algorithm failed
+        print("len of rail :", len(rail_v))
+        raise ValueError(len(rail_v))
+        # exit('algorithm failed to find a path!')  # algorithm failed
     return rail_v, rail_e
 
 
