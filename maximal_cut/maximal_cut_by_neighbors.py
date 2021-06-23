@@ -1,3 +1,4 @@
+import maximal_cut_gnr
 import point as pnt
 import geometric_network as ge_net
 import numpy as np
@@ -164,12 +165,70 @@ def cal_len_of_cut(net, set_a, set_b):
 
 
 # -----------------------------------------------------------------------------------------------------
+def max_cut_neighbors_gnr(n, r, flag):
+    net = generate_model_gnr(n, r)
+    set_a = []
+    set_b = []
+
+    # ***********************************************************************************
+    # Heuristic starting points for algorithm 3
+
+    # Call algorithm 1
+    if flag == 1:
+        set_a, set_b, len_of_cut = separate_to_sets_with_equal_probability(net, set_a, set_b)
+
+    # Call maximal_cut_bfs algorithm
+    if flag == 2:
+        set_a, set_b, len_of_cut = maximal_cut_bfs_algorithm(net, set_a, set_b)
+
+    # Call maximal_cut_gnr algorithm
+    if flag == 3:
+        set_a, set_b, len_of_cut = maximal_cut_gnr.maximal_cut_gnr_random_centers(net, set_a, set_b)
+
+
+    # ***********************************************************************************
+
+    # Call algorithm 3
+    set_a, set_b = update_sets_by_neighbors(net, set_a, set_b)
+    len_of_cut = cal_len_of_cut(net, set_a, set_b)
+    # For G(n,r) : need to divide len of edges in 2
+    # net.draw_network("maximal_cut_by_neighbors", nodes_list=set_a)
+    return len(net.edges), len_of_cut, 2*len_of_cut / len(net.edges)
+
+
+# -----------------------------------------------------------------------------------------------------
+def max_cut_neighbors_gnc(n, c, flag):
+    net = generate_model_gnc(n, c)
+    # net.print_edge_arr(net.edges)
+    set_a = []
+    set_b = []
+
+    # ***********************************************************************************
+    # Heuristic starting points for algorithm 3
+
+    # Call algorithm 1
+    if flag == 1:
+        set_a, set_b, len_of_cut = separate_to_sets_with_equal_probability(net, set_a, set_b)
+
+    # Call maximal_cut_bfs algorithm
+    if flag == 2:
+        set_a, set_b, len_of_cut = maximal_cut_bfs_algorithm(net, set_a, set_b)
+
+    # ***********************************************************************************
+
+    # Call algorithm 3
+    set_a, set_b = update_sets_by_neighbors(net, set_a, set_b)
+    len_of_cut = cal_len_of_cut(net, set_a, set_b)
+    # For G(n,c) : not need to divide len of edges in 2
+    return len(net.edges), len_of_cut, len_of_cut / len(net.edges)
+
+# -----------------------------------------------------------------------------------------------------
 
 def main():
-    '''# For G(n,r)
+    """# For G(n,r)
     n = 100
     r = 0.8
-    net = generate_model_gnr(n, r)'''
+    net = generate_model_gnr(n, r)"""
     # For G(n,c)
     n = 100
     c = 0.5
