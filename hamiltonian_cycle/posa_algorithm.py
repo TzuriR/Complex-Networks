@@ -30,8 +30,10 @@ def posa_loop(g, x, rail_v, rail_e):
     # Check if the path is not hamiltonian
     if len(rail_v) < len(g.nodes):
         if len(rail_v) < 3:
-            draw_before_exit(g, rail_e)
-            exit('algorithm failed to find a path!')  # algorithm failed
+            # draw_before_exit(g, rail_e)
+            print("len of rail :", len(rail_v))
+            # exit('algorithm failed to find a path!')  # algorithm failed
+            raise ValueError(len(rail_v))
         # If the algorithm didn't fail - call utility function that make it hamiltonian
         rail_v, rail_e = rot_ext(g, rail_v, rail_e)
     print("rail_v:", rail_v)
@@ -79,8 +81,10 @@ def make_cycle(g, rail_v, rail_e):
                     break
         i += 1
     if flag == 0:
-        draw_before_exit(g, rail_e)
-        exit('algorithm failed to find a cycle!')  # algorithm failed
+        # draw_before_exit(g, rail_e)
+        print("len of rail :", len(rail_v))
+        # exit('algorithm failed to find a cycle!')  # algorithm failed
+        raise ValueError(len(rail_v))
     return rail_v, rail_e
 
 
@@ -129,8 +133,10 @@ def rot_ext(g, rail_v, rail_e):
 
     # Do the extension rotation
     if len(adj_x) <= 1:
-        draw_before_exit(g, rail_e)
-        exit('algorithm failed to find a path!')  # algorithm failed
+        # draw_before_exit(g, rail_e)
+        print("len of rail :", len(rail_v))
+        # exit('algorithm failed to find a path!')  # algorithm failed
+        raise ValueError(len(rail_v))
     flag = 0  # tell us if we did swap
     for xi in adj_x:
         if xi == rail_v[len(rail_v) - 2]:
@@ -154,8 +160,10 @@ def rot_ext(g, rail_v, rail_e):
             break
         break
     if flag == 0:
-        draw_before_exit(g, rail_e)
-        exit('algorithm failed to find a path!')  # algorithm failed
+        # draw_before_exit(g, rail_e)
+        print("len of rail :", len(rail_v))
+        raise ValueError(len(rail_v))
+        # exit('algorithm failed to find a path!')  # algorithm failed
     return rail_v, rail_e
 
 
