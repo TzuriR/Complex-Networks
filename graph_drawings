@@ -1,0 +1,113 @@
+import numpy as np
+from scipy.interpolate import lagrange
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+
+def main_drawings_lagrange(file):
+    df = pd.read_csv(file)
+    name = file.removesuffix('.csv')
+    # print("df", df)
+    # print("df.shape", df.shape)
+    current_n = 0
+    colors = ['blue', 'yellow', 'red', 'orange', 'green', 'purple']  # Types of n
+    x = []
+    y = []
+    fig = plt.figure(figsize=(8, 6))
+    n = df.iloc[:, 0]
+    rcm = df.iloc[:, 1]
+    res_size = df.iloc[:, 2]
+    # print("n", n)
+    # print("r/c/m", rcm)
+    # print("res_size", res_size)
+    # x_new = np.arange(0.1, 0.9, 0.01)  # play with the last value
+    x_new = np.arange(rcm.min(), rcm.max(), 0.0001)
+    # print("x_new", x_new)
+    color_index = 0
+    for i in range(len(n)):
+        if n[i] == current_n or current_n == 0:
+            x.append(rcm[i])
+            y.append(res_size[i])
+        if n[i] != current_n or i == len(n) - 1:
+            if current_n != 0:
+                f = lagrange(x, y)
+                plt.plot(x_new, f(x_new), color=colors[color_index], label='n = ' + str(current_n))
+                plt.plot(x, y, 'ro', color="black")
+                color_index += 1
+            current_n = n[i]
+            x = [rcm[i]]
+            y = [res_size[i]]
+    plt.legend(loc='best')
+    plt.title("{name}".format(name=name))
+    plt.grid()
+    plt.xlabel('r/c/m')
+    plt.ylabel('res_size')
+    plt.savefig("{name}.png".format(name=name))
+    plt.show()
+
+
+def main_drawings_without_lagrange(file):
+    # social networks: blue - regular posa, red - the improvement
+    df = pd.read_csv(file)
+    name = file.removesuffix('.csv')
+    # print("df", df)
+    # print("df.shape", df.shape)
+    current_n = 0
+    colors = ['blue', 'yellow', 'red', 'orange', 'green', 'purple']
+    x = []
+    y = []
+    fig = plt.figure(figsize=(8, 6))
+    n = df.iloc[:, 0]
+    rcm = df.iloc[:, 1]
+    res_size = df.iloc[:, 2]
+    # print("n", n)
+    # print("r/c/m", rcm)
+    # print("res_size", res_size)
+    # x_new = np.arange(0.1, 0.9, 0.01)  # play with the last value
+    x_new = np.arange(rcm.min(), rcm.max(), 1)
+    # print("x_new", x_new)
+    color_index = 0
+    for i in range(len(n)):
+        if n[i] == current_n or current_n == 0:
+            x.append(rcm[i])
+            y.append(res_size[i])
+        if n[i] != current_n or i == len(n) - 1:
+            if current_n != 0:
+                plt.plot(x, y, color=colors[color_index], label='n = ' + str(current_n))
+                plt.plot(x, y, '.', color="black")
+                color_index += 1
+            current_n = n[i]
+            x = [rcm[i]]
+            y = [res_size[i]]
+    plt.legend(loc='best')
+    plt.title("{name}".format(name=name))
+    plt.grid()
+    plt.xlabel('r')
+    plt.ylabel('Avg_cut_ratio')
+    plt.savefig("{name}.png".format(name=name))
+    plt.show()
+    return
+
+
+def main_directories(ending_type):
+    files = []
+    # Add the path of your csv folder
+    for file in os.listdir("D:\graphs_for code"):
+        if file.endswith(ending_type):
+            files.append(file)
+            print(file)
+            filename = os.path.basename(file)
+            # print(filename)
+    print(files)
+    return files
+
+
+if __name__ == '__main__':
+    # main_directories('.csv')
+    '''for file in files:
+        # make a drawing
+        main_drawings(file)'''
+    file = "maximal_cut_gnr_by_eigenvectors.csv"
+    # main_drawings_lagrange(file)
+    main_drawings_without_lagrange(file)
